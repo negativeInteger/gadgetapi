@@ -1,0 +1,18 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Gadget API",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/auth/login": {
+        "post": {
+          "summary": "User Login",
+          "responses": {
+            "200": { "description": "Login Successful" }
+          }
+        }
+      }
+    }
+  }
+  

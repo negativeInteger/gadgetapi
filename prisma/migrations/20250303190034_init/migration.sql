@@ -15,9 +15,11 @@ CREATE TABLE "User" (
 CREATE TABLE "Gadget" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "codename" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" "GadgetStatus" NOT NULL DEFAULT 'AVAILABLE',
     "assignedToId" TEXT,
+    "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -42,6 +44,9 @@ CREATE TABLE "RefreshToken" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Gadget_codename_key" ON "Gadget"("codename");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");

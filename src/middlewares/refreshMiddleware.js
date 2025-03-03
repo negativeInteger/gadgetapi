@@ -12,6 +12,7 @@ export const verifyRefreshToken = async (req, res, next) => {
         req.user = decoded;
         next();
     } catch (err) {
+        console.log(err);
         res.status(403).json({ message: 'Invalid Refresh Token' });
     }
 };

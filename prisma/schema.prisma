@@ -5,11 +5,11 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"  // Generates Prisma Client
+  provider = "prisma-client-js"  // Generate Prisma Client
 }
 
 datasource db {
-  provider = "postgresql"       // Databsase Type
+  provider = "postgresql"       // Database 
   url      = env("DATABASE_URL")  
 }
 
@@ -24,25 +24,27 @@ model User {
 model Gadget {
   id            String        @id @default(uuid())
   name          String  
+  codename      String        @unique
   description   String
   status        GadgetStatus  @default(AVAILABLE)          
   assigned_to   User?         @relation(fields: [assignedToId], references: [id])
   assignedToId  String?
+  deletedAt     DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
 
 model RefreshToken {
-  id          String   @id @default(uuid())       // Unique Token ID
-  token       String   @unique                   // Actual Refresh Token
-  blacklisted Boolean  @default(false)           // Track if Token is Revoked
-  userId      String                             
-  device      String?                            // Optional Device Info
-  ipAddress   String?                            // Optional IP Address
-  expiresAt   DateTime                           // Expiration Date
-  revokedAt   DateTime?                          // Optional Revocation Timestamp
-  createdAt   DateTime @default(now())           // Creation Date
-  updatedAt   DateTime @updatedAt               // Auto-Update on Blacklist
+  id            String        @id @default(uuid())      // Unique Token ID
+  token         String        @unique                   // Actual Refresh Token
+  blacklisted   Boolean       @default(false)           // Track if Token is Revoked
+  userId        String                             
+  device        String?                                 // Optional Device Info
+  ipAddress     String?                                 // Optional IP Address
+  expiresAt     DateTime                                // Expiration Date
+  revokedAt     DateTime?                               // Optional Revocation Timestamp
+  createdAt     DateTime      @default(now())           // Creation Date
+  updatedAt     DateTime      @updatedAt                // Auto-Update on Blacklist
 }
 
 enum GadgetStatus {
