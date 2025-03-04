@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, refreshToken } from '../controllers/authController.js';
+import { registerUser, loginUser, refreshToken, logoutUser } from '../controllers/authController.js';
 import { verifyRefreshToken } from '../middlewares/refreshMiddleware.js';
 
 const router = express.Router();
@@ -8,6 +8,11 @@ const router = express.Router();
  * @desc User Login
  */
 router.post('/login', loginUser);
+/**
+ * @route POST /auth/logout
+ * @desc User Logout
+ */
+router.post('/logout', logoutUser);
 /**
  * @route POST /auth/register
  * @desc User Register

@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 export const prisma = new PrismaClient();
 
+// Connect with Postgres
 (async () => {
     try {
         await prisma.$connect();
