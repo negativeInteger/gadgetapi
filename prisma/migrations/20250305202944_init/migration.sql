@@ -19,7 +19,6 @@ CREATE TABLE "Gadget" (
     "description" TEXT NOT NULL,
     "status" "GadgetStatus" NOT NULL DEFAULT 'AVAILABLE',
     "assignedToId" TEXT,
-    "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

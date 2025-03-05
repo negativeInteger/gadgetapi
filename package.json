@@ -1,10 +1,10 @@
 {
   "name": "imf-gadget-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
-    "server": "nodemon ./src/server.js"
+    "server": "nodemon ./api/server.js"
   },
   "keywords": [],
   "author": "",

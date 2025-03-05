@@ -1,7 +1,8 @@
 import { prisma } from '../config/db.js';
 import { hashPassword, comparePassword } from '../utils/hash.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt.js';
+import { generateAccessToken, generateRefreshToken } from '../utils/generateTokens.js';
 import { saveRefreshToken } from '../models/refreshToken.js';
+import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/tokenExpiration.js';
 /**
  * Register Service
  * Saves User Credentials + Generates JWT Tokens
@@ -37,7 +38,7 @@ export const login = async ({ username, password }, device, ipAddress) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
-    await saveRefreshToken(refreshToken, user.id, device, ipAddress, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+    await saveRefreshToken(refreshToken, user.id, device, ipAddress, new Date(Date.now() + REFRESH_TOKEN_EXPIRE_TIME))
 
-    return { accessToken, refreshToken };
+    return { user, accessToken, refreshToken };
 };

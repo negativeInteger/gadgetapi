@@ -29,7 +29,6 @@ model Gadget {
   status        GadgetStatus  @default(AVAILABLE)          
   assigned_to   User?         @relation(fields: [assignedToId], references: [id])
   assignedToId  String?
-  deletedAt     DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
