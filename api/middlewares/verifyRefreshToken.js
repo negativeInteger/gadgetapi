@@ -5,6 +5,9 @@ import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/tokenExpiration.js";
 import { clearCookies } from '../utils/clearCookies.js'
 
 export const verifyRefreshToken = async (req, res, next) => {
+    if (!req.triggerRefresh) {
+        return next(); // Skip refresh if access token is valid
+    }
     const refreshToken  = req.cookies.refreshToken;
     if(!refreshToken) {        
         clearCookies(res);

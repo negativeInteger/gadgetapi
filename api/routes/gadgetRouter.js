@@ -1,5 +1,5 @@
 import express from 'express';
-import { addGadget, listGadgets } from '../controllers/gadgetController.js';
+import { addGadget, listUserGadgets, listGadgetsInventory } from '../controllers/gadgetController.js';
 import { isAdmin } from '../middlewares/roleMiddleware.js';
 import { authenticateUser } from  '../middlewares/authenticateUser.js';
 
@@ -13,6 +13,11 @@ router.post('/', authenticateUser, isAdmin, addGadget);
  * @route GET /gadgets
  * @desc List Gadgets
  */
-router.get('/', authenticateUser, listGadgets);
+router.get('/', authenticateUser, listUserGadgets);
+/**
+ * @route GET /gadgets/inventory
+ * @desc List All Gadgets (ADMIN ACCESS ONLY)
+ */
+router.get('/inventory', authenticateUser, isAdmin, listGadgetsInventory);
 
 export { router as gadgetRouter };

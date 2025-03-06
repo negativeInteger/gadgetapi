@@ -1,25 +1,38 @@
-import { createGadget, getGadgets } from "../services/gadgetService.js";
+import { createGadget, getUserGadgets, getGadgetsInventory } from "../services/gadgetService.js";
+import { gadgetSchema } from "../utils/validation.js";
 /**
  * Add Gadget Controller
  */
 export const addGadget = async (req, res, next) => {
     try {
-        const { id } = req.user;
-        const gadget = await createGadget(req.body);
-        gadget.assignedToId = id;
-        res.status(201).json(gadget);
+        const validatedGadget = gadgetSchema.parse(req.body);
+        const newGadget = await createGadget({...validatedGadget}, req.user.id);
+        res.status(201).json(newGadget);
     } catch (err) {
         next(err);
     }
 };
 /**
- * List Gadgets Controller
+ * List UserGadgets Controller
  */
 
-export const listGadgets = async (req, res, next) => {
+export const listUserGadgets = async (req, res, next) => {
     try {
-        const gadgets = await getGadgets(req.query);
-        res.status(200).json(gadgets);
+        const userGadgets = await getUserGadgets(req.query, req.user.id);
+        res.status(200).json(userGadgets);
+    } catch (err) {
+        next(err);
+    };  
+};
+
+/**
+ * List UserGadgets Controller
+ */
+
+export const listGadgetsInventory = async (req, res, next) => {
+    try {
+        const gadgetsInventory = await getGadgetsInventory(req.query, req.user.id);
+        res.status(200).json(gadgetsInventory);
     } catch (err) {
         next(err);
     };  

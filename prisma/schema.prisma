@@ -23,12 +23,12 @@ model User {
 
 model Gadget {
   id            String        @id @default(uuid())
+  assignedToId  String?
+  assigned_to   User?         @relation(fields: [assignedToId], references: [id])
   name          String  
   codename      String        @unique
   description   String
   status        GadgetStatus  @default(AVAILABLE)          
-  assigned_to   User?         @relation(fields: [assignedToId], references: [id])
-  assignedToId  String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
