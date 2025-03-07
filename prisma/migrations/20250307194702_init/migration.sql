@@ -21,6 +21,7 @@ CREATE TABLE "Gadget" (
     "status" "GadgetStatus" NOT NULL DEFAULT 'AVAILABLE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "decommissionedAt" TIMESTAMP(3),
 
     CONSTRAINT "Gadget_pkey" PRIMARY KEY ("id")
 );

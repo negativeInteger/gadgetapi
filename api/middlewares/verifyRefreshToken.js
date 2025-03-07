@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { isBlacklisted } from "../models/refreshToken.js";
 import { generateAccessToken } from "../utils/generateTokens.js";
-import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/tokenExpiration.js";
+import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/expirationTimes.js";
 import { clearCookies } from '../utils/clearCookies.js'
 
 export const verifyRefreshToken = async (req, res, next) => {

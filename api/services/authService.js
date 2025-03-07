@@ -2,7 +2,7 @@ import { prisma } from '../config/db.js';
 import { hashPassword, comparePassword } from '../utils/hash.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateTokens.js';
 import { saveRefreshToken } from '../models/refreshToken.js';
-import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/tokenExpiration.js';
+import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/expirationTimes.js';
 /**
  * Register Service
  * Saves User Credentials + Generates JWT Tokens
@@ -19,7 +19,6 @@ export const register = async (data) => {
             }
         }); 
     } catch (err) {
-        console.error('Error registering user', err);
         throw new Error('DATABASE ERROR');
     }
     return

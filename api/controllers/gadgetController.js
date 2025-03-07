@@ -1,4 +1,5 @@
-import { createGadget, getUserGadgets, getGadgetsInventory } from "../services/gadgetService.js";
+import { z } from "zod";
+import { create, list, decommission, update } from "../services/gadgetService.js";
 import { gadgetSchema } from "../utils/validation.js";
 /**
  * Add Gadget Controller
@@ -6,34 +7,69 @@ import { gadgetSchema } from "../utils/validation.js";
 export const addGadget = async (req, res, next) => {
     try {
         const validatedGadget = gadgetSchema.parse(req.body);
-        const newGadget = await createGadget({...validatedGadget}, req.user.id);
+        const newGadget = await create({...validatedGadget}, req.user.id);
         res.status(201).json(newGadget);
     } catch (err) {
+        if (err instanceof z.ZodError) {
+            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+        }
         next(err);
     }
 };
-/**
- * List UserGadgets Controller
- */
 
-export const listUserGadgets = async (req, res, next) => {
+/**
+ * List Gadgets Controller
+ */
+export const getGadgets = async (req, res, next) => {
     try {
-        const userGadgets = await getUserGadgets(req.query, req.user.id);
-        res.status(200).json(userGadgets);
+        const gadgets = await list(req.query, req.user.id);
+        res.status(200).json(gadgets);
     } catch (err) {
         next(err);
     };  
 };
 
 /**
- * List UserGadgets Controller
+ * Update Gadget Controller
  */
-
-export const listGadgetsInventory = async (req, res, next) => {
+export const updateGadget = async (req, res, next) => {
     try {
-        const gadgetsInventory = await getGadgetsInventory(req.query, req.user.id);
-        res.status(200).json(gadgetsInventory);
+        const validatedData = gadgetSchema.parse(req.body);
+        const updatedGadget = await update(validatedData, req.user.id);
+        res.status(200).json(updatedGadget);
     } catch (err) {
+        if (err instanceof z.ZodError) {
+            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+        }
         next(err);
-    };  
+    }; 
+};
+
+/**
+ * Delete Gadget Controller
+ */
+export const deleteGadget = async (req, res, next) => {
+    try {
+        const deletedGadget = await decommission(req.user.id);
+        res.status(200).json(deletedGadget);
+    } catch (err) {
+        if (err instanceof z.ZodError) {
+            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+        }
+        next(err);
+    }; 
+};
+/**
+ * Self-Destruct Gadget Controller
+ */
+export const selfDestructGadget = async (req, res, next) => {
+    try {
+        const deletedGadget = await decommission(req.user.id);
+        res.status(200).json(deletedGadget);
+    } catch (err) {
+        if (err instanceof z.ZodError) {
+            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+        }
+        next(err);
+    }; 
 };

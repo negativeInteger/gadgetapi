@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN_EXPIRE_TIME, REFRESH_TOKEN_EXPIRE_TIME } from "../config/tokenExpiration.js";
+import { ACCESS_TOKEN_EXPIRE_TIME, REFRESH_TOKEN_EXPIRE_TIME } from "../config/expirationTimes.js";
 
 export const setCookies = (res, accessToken, refreshToken) => {
     res.cookie('accessToken', accessToken, {

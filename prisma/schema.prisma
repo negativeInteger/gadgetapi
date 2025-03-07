@@ -18,19 +18,17 @@ model User {
   username  String     @unique                        // unique username
   password  String                                    // hashed password
   role      String     @default("agent")              // Role-Based-Access (agent/admin)
-  gadget    Gadget[]                                  // one-to-many relationship
 }
 
 model Gadget {
-  id            String        @id @default(uuid())
-  assignedToId  String?
-  assigned_to   User?         @relation(fields: [assignedToId], references: [id])
-  name          String  
-  codename      String        @unique
-  description   String
-  status        GadgetStatus  @default(AVAILABLE)          
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                String        @id @default(uuid())
+  name              String  
+  codename          String        @unique
+  description       String
+  status            GadgetStatus  @default(AVAILABLE)          
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  decommissionedAt  DateTime?      
 }
 
 model RefreshToken {
@@ -41,7 +39,7 @@ model RefreshToken {
   device        String?                                 // Optional Device Info
   ipAddress     String?                                 // Optional IP Address
   expiresAt     DateTime                                // Expiration Date
-  revokedAt     DateTime?                               // Optional Revocation Timestamp
+  revokedAt     DateTime?                               // Revocation Timestamp
   createdAt     DateTime      @default(now())           // Creation Date
   updatedAt     DateTime      @updatedAt                // Auto-Update on Blacklist
 }
