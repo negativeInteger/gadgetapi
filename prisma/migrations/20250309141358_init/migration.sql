@@ -14,7 +14,6 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Gadget" (
     "id" TEXT NOT NULL,
-    "assignedToId" TEXT,
     "name" TEXT NOT NULL,
     "codename" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -50,6 +49,3 @@ CREATE UNIQUE INDEX "Gadget_codename_key" ON "Gadget"("codename");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");
-
--- AddForeignKey
-ALTER TABLE "Gadget" ADD CONSTRAINT "Gadget_assignedToId_fkey" FOREIGN KEY ("assignedToId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

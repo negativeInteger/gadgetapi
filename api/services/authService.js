@@ -19,7 +19,7 @@ export const register = async (data) => {
             }
         }); 
     } catch (err) {
-        throw new Error('DATABASE ERROR');
+        throw new Error('User already exists');
     }
     return
 };

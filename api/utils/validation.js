@@ -21,3 +21,7 @@ export const gadgetSchema = z.object({
         'DECOMMISSIONED'
     ]).default('AVAILABLE')
 });
+
+export const confirmationCodeSchema = z.object({
+    code: z.string().length(6)
+}); 

@@ -14,10 +14,7 @@ export const create = async ({ name, description, status }, id) => {
             name,
             codename,
             description,
-            status,
-            assigned_to: { // This will automatically push gadget to both User and Gadget tables
-                connect: { id }
-            }
+            status
         }
     });
 
@@ -54,22 +51,34 @@ export const update = async ({ name, description, status }, id) => {
     });
 };
 /**
+ * Delete Gadget Service (Permanent Deletion)
+ */
+export const deleteService = async (id) => {
+    return await prisma.gadget.delete({
+        where: { id },
+    });
+};
+/**
  * Soft Delete Gadget (Marking as DECOMMISSIONED)
  */
 export const decommission = async (id) => {
     return await prisma.gadget.update({
         where: { id },
-        data: { status: 'DECOMMISSIONED' }
+        data: { 
+            status: 'DECOMMISSIONED',
+            decommissionedAt: new Date(Date.now()).toISOString()
+         }
     });
 };
 /**
  * Self-Destruct Gadget 
  */
-export const selfDestruct = async (id) => {
+export const selfDestruct = async () => {
     const confirmationCode = generateCode();
     const response = {
         message: "Confirmation code generated. Use this code to confirm self-destruct.",
-        code: "123456"
+        expiresIn: "3 minutes",
+        code: confirmationCode
     }
     return response;
 };
