@@ -64,7 +64,7 @@ export const deleteGadget = async (req, res, next) => {
  */
 export const selfDestructGadget = (req, res, next) => {
     try {
-        const { message, expiresIn, code } = selfDestruct();
+        const { message, expiresIn, code } = selfDestruct(req.params.id);
         const timeToLive = 3 * 60 * 1000; // 3 mins
         setItemToLocalStorage('code', code, timeToLive);
         res.status(200).json({ message, expiresIn, code });
@@ -81,7 +81,7 @@ export const selfDestructGadgetConfirm = async (req, res, next) => {
         const { code: inputCode } = validatedData;
         const validCode = getItemFromLocalStorage('code');
         const isValidCode = inputCode === validCode;
-        if (! isValidCode) throw new ExpressError('Invalid Credentials', 'Incorrect Confirmation Code', 400);
+        if (! isValidCode) throw new ExpressError('Bad Request', 'Incorrect Confirmation Code', 401);
         removeItemFromLocalStorage('code');
         await deleteService(req.params.id);
         return res.status(200).json({ message: 'Gadget Deleted Successfully' }); 

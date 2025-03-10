@@ -16,11 +16,11 @@ export const register = async (data) => {
             data: {
                 username,
                 password: hashedPassword,
-                role: data.role || 'agent'
+                role: data.role || 'user'
             }
         }); 
     } catch (err) {
-        throw new ExpressError('Conflict', 'username is already registered', 409);
+        throw new ExpressError('Conflict', 'Username is already registered', 409);
     }
 };
 /**
@@ -29,10 +29,10 @@ export const register = async (data) => {
  */
 export const login = async ({ username, password }, device, ipAddress) => {
     const user = await prisma.user.findUnique({ where: { username } });
-    if (!user) throw new ExpressError('Authorization','Invalid Credentials', 404);
+    if (!user) throw new ExpressError('Authentication','Invalid Credentials', 401);
 
     const validPassword = await comparePassword(password, user.password);
-    if (!validPassword) throw new ExpressError('Authorization', 'Invalid Credentials', 404);
+    if (!validPassword) throw new ExpressError('Authentication', 'Invalid Credentials', 401);
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);

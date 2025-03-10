@@ -48,46 +48,77 @@ export const list = async ({ page = 1, limit = 10, status }) => {
  * Update Gadget
  */
 export const update = async ({ name, description, status }, id) => {
-    const updatedGadget = await prisma.gadget.update({
-        where: { id },
-        data: { name, description, status }
-    });
-    if (!updatedGadget) throw new ExpressError('Internal Server Error', 'Failed to update gadget', 500);
-    return updatedGadget;
+    try {
+        const updatedGadget = await prisma.gadget.update({
+            where: { id },
+            data: { name, description, status }
+        });
+        return updatedGadget;
+    } catch (err) {
+        if (err.code === "P2025") {  // Prisma error code if gadget-id not found
+            throw new ExpressError("Not Found", "Gadget not found", 404);
+        }
+        throw new ExpressError("Internal Server Error", "Failed to update gadget", 500);
+    };    
 };
 /**
  * Delete Gadget Service (Permanent Deletion)
  */
 export const deleteService = async (id) => {
-    return await prisma.gadget.delete({
-        where: { id },
-    });
+    try {
+        await prisma.gadget.delete({
+            where: { id }   
+        });
+    } catch (err) {
+        if (err.code === "P2025") {  // Prisma error code if gadget-id not found
+            throw new ExpressError("Not Found", "Gadget not found", 404);
+        }
+        throw new ExpressError("Internal Server Error", "Failed to delete gadget", 500);
+    };
 };
 /**
  * Soft Delete Gadget (Marking as DECOMMISSIONED)
  */
 export const decommission = async (id) => {
-    const decommissionedGadget = await prisma.gadget.update({
-        where: { id },
-        data: { 
-            status: 'DECOMMISSIONED',
-            decommissionedAt: new Date(Date.now()).toISOString()
-         }
-    });
-    if (!decommissionedGadget) throw new ExpressError('Internal Server Error', 'Failed to update gadget', 500);
-    return decommissionedGadget;
+    try {
+        const decommissionedGadget = await prisma.gadget.update({
+            where: { id },
+            data: { 
+                status: 'DECOMMISSIONED',
+                decommissionedAt: new Date(Date.now()).toISOString()
+             }
+        });
+        return decommissionedGadget;
+    } catch (err) {
+        if (err.code === "P2025") {  // Prisma error code if gadget-id not found
+            throw new ExpressError("Not Found", "Gadget not found", 404);
+        }
+        throw new ExpressError("Internal Server Error", "Failed to delete gadget", 500);
+    }
 };
 /**
  * Self-Destruct Gadget 
  */
-export const selfDestruct = () => {
-    const confirmationCode = generateConfirmationCode();
-    const response = {
-        message: "Confirmation code generated. Use this code to confirm self-destruct.",
-        expiresIn: "3 minutes",
-        code: confirmationCode
+export const selfDestruct = async (id) => {
+    try {
+        const gadget = await prisma.gadget.findUnique({
+            where: { id }
+        });
+        const confirmationCode = generateConfirmationCode();
+        const response = {
+            message: "Confirmation code generated. Use this code to confirm self-destruct.",
+            expiresIn: "3 minutes",
+            code: confirmationCode
+        }
+        return response;
+    } catch (err) {
+        if (err.code === "P2025") {  // Prisma error code if gadget-id not found
+            throw new ExpressError("Not Found", "Gadget not found", 404);
+        }
+        throw new ExpressError("Internal Server Error", "Failed to initiate self-destruct", 500);
     }
-    return response;
+    
+    
 };
 
 

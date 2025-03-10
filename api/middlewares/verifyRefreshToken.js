@@ -10,12 +10,12 @@ export const verifyRefreshToken = async (req, res, next) => {
     }
     const refreshToken  = req.cookies.refreshToken;
     if(!refreshToken) {        
-        return next(new ExpressError('Authorization', 'You must be logged in to access this resource', 401));
+        return next(new ExpressError('Authentication', 'User must be logged in to access this resource', 401));
     }
     try {
         const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
         const blacklisted = await isBlacklisted(refreshToken);
-        if (blacklisted) throw new ExpressError('Authorization', 'Something Went Wrong. Please log in again.', 401);
+        if (blacklisted) throw new ExpressError('Authentication', 'Something Went Wrong. Please log in again.', 401);
         const accessToken = generateAccessToken(user);
         res.cookie("accessToken", accessToken, {
             httpOnly: true,

@@ -28,9 +28,13 @@ const router = express.Router();
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: List of gadgets
+ *         description: List all gadgets in the inventory
  *       401:
- *         description: Unauthorized
+ *         description: User must be logged in to access this resource
+ *       403:
+ *         description: Access Denied Admins Only
+ *       500:
+ *         description: Failed to retrieve gadgets
  */
 router.get('/', authenticateUser, getGadgets);
 /**
@@ -54,13 +58,19 @@ router.get('/', authenticateUser, getGadgets);
  *               description:
  *                 type: string
  *                 example: "A high-tech wearable gadget"
+ *               status:
+ *                 type: string
+ *                 enum: [AVAILABLE, DEPLOYED, DESTROYED, DECOMMISSIONED]
+ *                 example: AVAILABLE
  *     responses:
  *       201:
  *         description: Gadget created successfully
+ *       400:
+ *         description: Validation Error
  *       401:
- *         description: Unauthorized
+ *         description: User must be logged in to access this resource
  *       403:
- *         description: Forbidden (Admin only)
+ *         description: Access Denied - Admins Only
  */
 router.post('/', authenticateUser, isAdmin, addGadget);
 
@@ -77,8 +87,9 @@ router.post('/', authenticateUser, isAdmin, addGadget);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: The gadget ID
+ *           type: string
+ *           format: uuid
+ *         description: Gadget ID
  *     requestBody:
  *       required: true
  *       content:
@@ -92,16 +103,25 @@ router.post('/', authenticateUser, isAdmin, addGadget);
  *               description:
  *                 type: string
  *                 example: "An updated description"
+ *               status:
+ *                 type: string
+ *                 enum: [AVAILABLE, DEPLOYED, DESTROYED, DECOMMISSIONED]
+ *                 example: "Updated Status"
  *     responses:
  *       200:
  *         description: Gadget updated successfully
+ *       400:
+ *         description: Validation Error
  *       401:
- *         description: Unauthorized
+ *         description: User must be logged in to access this resource
  *       403:
- *         description: Forbidden (Admin only)
+ *         description: Access Denied - Admins Only
  *       404:
  *         description: Gadget not found
+ *       500:
+ *         description: Failed to update gadget
  */
+
 router.patch('/:id', authenticateUser, isAdmin, updateGadget);
 /**
  * @swagger
@@ -116,15 +136,16 @@ router.patch('/:id', authenticateUser, isAdmin, updateGadget);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: The gadget ID
+ *           type: string
+ *           format: uuid
+ *         description: Gadget ID
  *     responses:
  *       200:
  *         description: Gadget deleted successfully
  *       401:
- *         description: Unauthorized
+ *         description: User must be logged in to access this resource
  *       403:
- *         description: Forbidden (Admin only)
+ *         description: Access Denied - Admins only
  *       404:
  *         description: Gadget not found
  */
@@ -142,17 +163,34 @@ router.delete('/:id', authenticateUser, isAdmin, deleteGadget);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: The gadget ID
+ *           type: string
+ *           format: uuid
+ *         description: Gadget ID
  *     responses:
  *       200:
  *         description: Self-destruct initiated. Confirmation code sent.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Confirmation code generated. Use this code to confirm self-destruct."
+ *                 expiresIn:
+ *                   type: string
+ *                   example: 3 minutes
+ *                 code:
+ *                   type: string
+ *                   example: "923783"
  *       401:
- *         description: Unauthorized
+ *         description: User must be logged in to access this resource
  *       403:
- *         description: Forbidden (Admin only)
+ *         description: Access Denied - Admins only
  *       404:
  *         description: Gadget not found
+ *       500:
+ *         description: Failed to initiate self-destruct
  */
 router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget);
 /**
@@ -168,8 +206,9 @@ router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget)
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: The gadget ID
+ *           type: string
+ *           format: uuid
+ *         description: Gadget ID
  *     requestBody:
  *       required: true
  *       content:
@@ -177,20 +216,23 @@ router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget)
  *           schema:
  *             type: object
  *             properties:
- *               confirmationCode:
+ *               code:
  *                 type: string
  *                 example: "123456"
  *     responses:
  *       200:
- *         description: Gadget permanently deleted
+ *         description: Gadget deleted successfully
  *       400:
- *         description: Invalid confirmation code
+ *         description: Validation Error / Incorrect Confirmation Code
  *       401:
- *         description: Unauthorized
+ *         description: User must be logged in to access this resource  
  *       403:
- *         description: Forbidden (Admin only)
+ *         description: Access Denied - Admins Only
  *       404:
  *         description: Gadget not found
+ *       500:
+ *         description: Failed to delete gadget
  */
 router.post('/:id/self-destruct/confirm', authenticateUser, isAdmin, selfDestructGadgetConfirm);
+
 export { router as gadgetRouter };

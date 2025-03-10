@@ -17,7 +17,7 @@ model User {
   id        String     @id @default(uuid())           // UUID
   username  String     @unique                        // unique username
   password  String                                    // hashed password
-  role      String     @default("agent")              // Role-Based-Access (agent/admin)
+  role      String     @default("user")               // Role-Based-Access (user/admin)
 }
 
 model Gadget {
