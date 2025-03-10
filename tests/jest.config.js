@@ -1,4 +1,4 @@
-export default {
-    setupFilesAfterEnv: ['api/tests/setup.js'],
-    testEnvironment: 'node',
-};
+// export default {
+//     setupFilesAfterEnv: ['api/tests/setup.js'],
+//     testEnvironment: 'node',
+// };
