@@ -1,4 +1,5 @@
 node_modules
 checkpoints.txt
 .env
+.env.test
 codes

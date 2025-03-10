@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "server": "nodemon ./api/server.js",
-    "test": "jest"
+    "pretest": "npx prisma migrate deploy --env-file .env.test",
+    "test": "jest --setupFilesAfterEnv=api/tests/setup.js"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +28,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
     "nodemon": "^3.1.9",
     "supertest": "^7.0.0"
