@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import { isBlacklisted } from "../models/refreshToken.js";
+import { isBlacklisted } from "../services/tokenService.js";
 import { generateAccessToken } from "../utils/generateTokens.js";
 import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/expirationTimes.js";
-import { clearCookies } from '../utils/clearCookies.js'
+import { ExpressError } from '../errors/ExpressError.js';
 
 export const verifyRefreshToken = async (req, res, next) => {
     if (!req.triggerRefresh) {
@@ -10,13 +10,12 @@ export const verifyRefreshToken = async (req, res, next) => {
     }
     const refreshToken  = req.cookies.refreshToken;
     if(!refreshToken) {        
-        clearCookies(res);
-        return res.status(403).json({ message: 'You need to login first : (' });
+        return next(new ExpressError('Authorization', 'You must be logged in to access this resource', 401));
     }
     try {
         const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
         const blacklisted = await isBlacklisted(refreshToken);
-        if (blacklisted) return res.status(403).json({ message: 'Token Blacklisted' });
+        if (blacklisted) throw new ExpressError('Authorization', 'Something Went Wrong. Please log in again.', 401);
         const accessToken = generateAccessToken(user);
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
@@ -27,7 +26,6 @@ export const verifyRefreshToken = async (req, res, next) => {
         req.user = user;
         next();
     } catch (err) {
-        console.log(err);
-        return res.status(403).json({ message: 'Session Expired, Please Login' });
+        next(err);
     }
 };

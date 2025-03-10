@@ -1,8 +1,9 @@
 import { prisma } from '../config/db.js';
 import { hashPassword, comparePassword } from '../utils/hash.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateTokens.js';
-import { saveRefreshToken } from '../models/refreshToken.js';
+import { saveRefreshToken } from '../services/tokenService.js';
 import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/expirationTimes.js';
+import { ExpressError } from '../errors/ExpressError.js';
 /**
  * Register Service
  * Saves User Credentials + Generates JWT Tokens
@@ -19,9 +20,8 @@ export const register = async (data) => {
             }
         }); 
     } catch (err) {
-        throw new Error('User already exists');
+        throw new ExpressError('Conflict', 'username is already registered', 409);
     }
-    return
 };
 /**
  * Login Service
@@ -29,10 +29,10 @@ export const register = async (data) => {
  */
 export const login = async ({ username, password }, device, ipAddress) => {
     const user = await prisma.user.findUnique({ where: { username } });
-    if (!user) throw new Error('Invalid Credentials');
+    if (!user) throw new ExpressError('Authorization','Invalid Credentials', 404);
 
     const validPassword = await comparePassword(password, user.password);
-    if (!validPassword) throw new Error('Invalid Credentials');
+    if (!validPassword) throw new ExpressError('Authorization', 'Invalid Credentials', 404);
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);

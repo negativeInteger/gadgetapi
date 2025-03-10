@@ -1,18 +1,20 @@
-import { any, z } from "zod";
+import { z } from "zod";
 import { create, list, decommission, update, selfDestruct, deleteService } from "../services/gadgetService.js";
-import { confirmationCodeSchema, gadgetSchema } from "../utils/validation.js";
+import { gadgetSchema } from "../validations/gadgetValidation.js";
+import { confirmationCodeSchema } from "../validations/confirmationCodeSchema.js";
 import { setItemToLocalStorage, getItemFromLocalStorage, removeItemFromLocalStorage } from "../utils/localStorage.js";
+import { ExpressError } from "../errors/ExpressError.js";
 /**
  * Add Gadget Controller
  */
 export const addGadget = async (req, res, next) => {
     try {
         const validatedGadget = gadgetSchema.parse(req.body);
-        const newGadget = await create({...validatedGadget}, req.user.id);
+        const newGadget = await create(validatedGadget);
         res.status(201).json(newGadget);
     } catch (err) {
         if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+            return next(new ExpressError('Validation Error', err.errors, 400));
         }
         next(err);
     }
@@ -23,7 +25,7 @@ export const addGadget = async (req, res, next) => {
  */
 export const getGadgets = async (req, res, next) => {
     try {
-        const gadgets = await list(req.query, req.user.id);
+        const gadgets = await list(req.query);
         res.status(200).json(gadgets);
     } catch (err) {
         next(err);
@@ -40,7 +42,7 @@ export const updateGadget = async (req, res, next) => {
         res.status(200).json(updatedGadget);
     } catch (err) {
         if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+            return next(new ExpressError('Validation Error', err.errors, 400));
         }
         next(err);
     }; 
@@ -54,26 +56,20 @@ export const deleteGadget = async (req, res, next) => {
         const deletedGadget = await decommission(req.params.id);
         res.status(200).json(deletedGadget);
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
-        }
         next(err);
     }; 
 };
 /**
  * Self-Destruct Gadget Controller
  */
-export const selfDestructGadget = async (req, res, next) => {
+export const selfDestructGadget = (req, res, next) => {
     try {
-        const { message, expiresIn, code } = await selfDestruct();
+        const { message, expiresIn, code } = selfDestruct();
         const timeToLive = 3 * 60 * 1000; // 3 mins
         setItemToLocalStorage('code', code, timeToLive);
         res.status(200).json({ message, expiresIn, code });
     } catch (err) {
-        if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
-        }
-        next(err);
+        next(new ExpressError('Internal Server Error', 'Failed to process self-destruct', 500));
     }; 
 };
 /**
@@ -85,13 +81,13 @@ export const selfDestructGadgetConfirm = async (req, res, next) => {
         const { code: inputCode } = validatedData;
         const validCode = getItemFromLocalStorage('code');
         const isValidCode = inputCode === validCode;
-        if (! isValidCode) return res.status(403).json({ message: 'Incorrect Confirmation Code' });
+        if (! isValidCode) throw new ExpressError('Invalid Credentials', 'Incorrect Confirmation Code', 400);
         removeItemFromLocalStorage('code');
-        const deletedGadget = await deleteService(req.params.id);
+        await deleteService(req.params.id);
         return res.status(200).json({ message: 'Gadget Deleted Successfully' }); 
     } catch (err) {
         if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+            return next(new ExpressError('Validation Error', err.errors, 400));
         }
         next(err);
     }; 

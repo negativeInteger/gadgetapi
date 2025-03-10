@@ -7,7 +7,7 @@ import {
     selfDestructGadgetConfirm, 
     updateGadget 
 } from '../controllers/gadgetController.js';
-import { isAdmin } from '../middlewares/roleMiddleware.js';
+import { isAdmin } from '../middlewares/isAdmin.js';
 import { authenticateUser } from  '../middlewares/authenticateUser.js';
 
 const router = express.Router();

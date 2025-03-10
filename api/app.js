@@ -5,8 +5,9 @@ import cookieParser from 'cookie-parser';
 import { LocalStorage } from 'node-localstorage';
 import { authRouter } from './routes/authRouter.js';
 import { gadgetRouter } from './routes/gadgetRouter.js'
-import { errorHandler } from './middlewares/errorHandler.js';
+import { errorHandler } from './errors/errorHandler.js';
 import { setupSwagger } from './config/swagger.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 dotenv.config();
 
 const app = express();
@@ -18,6 +19,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/gadgets', gadgetRouter);
+// Handle undefined routes
+app.use(notFoundHandler)
+// Global error handler
 app.use(errorHandler)
 
 export { app, localStorage };

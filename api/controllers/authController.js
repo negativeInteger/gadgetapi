@@ -1,18 +1,18 @@
 import { z } from 'zod'; 
 import { register, login } from "../services/authService.js";
-import { registerSchema, loginSchema } from "../utils/validation.js";
-import { blacklistToken } from '../models/refreshToken.js';
-import { clearCookies } from  '../utils/clearCookies.js';
-import { setCookies } from '../utils/setCookies.js';
+import { registerSchema, loginSchema } from "../validations/authValidation.js";
+import { blacklistToken } from '../services/tokenService.js';
+import { setCookies, clearCookies } from '../utils/cookie.js';
+import { ExpressError } from '../errors/ExpressError.js';
 
 export const registerUser = async (req, res, next) => {
     try {
         const validatedData = registerSchema.parse(req.body);
         await register(validatedData);
-        res.status(201).json({ message: `Registration Success!!!, Hey ${validatedData.username}, you can login now` });
+        return res.status(201).json({ message: `Registration Success!!!, Hey ${validatedData.username}, you can login now` });
     } catch (err) {
         if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+            return next(new ExpressError('Validation Error', err.errors, 400));
         }
         next(err);
     }
@@ -28,7 +28,7 @@ export const loginUser = async (req, res, next) => {
         res.status(200).json({ message: `Hey ${validatedData.username}, Login Successful` });
     } catch (err) {
         if (err instanceof z.ZodError) {
-            return res.status(400).json({ message: "Validation Error", errors: err.errors });
+            return next(new ExpressError('Validation Error', err.errors, 400));
         }
         next(err);
     }
@@ -37,14 +37,14 @@ export const loginUser = async (req, res, next) => {
 export const logoutUser = async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken;
     if(!refreshToken) {
-        res.status(403).json({ message: 'You need to login first : (' })
-        return clearCookies(res);
+        clearCookies(res);
+        return next(new ExpressError('Not Found', 'Must be logged in for logging out', 404));
     }
     await blacklistToken(refreshToken);
     try {
         clearCookies(res);
         return res.status(200).json({ message: 'Logged Out Successfully!!!'})
     } catch (err) {
-        next(err);
+        next(new ExpressError('Internal Server Error', 'Error occurred while logging out', 500));
     }
 };
