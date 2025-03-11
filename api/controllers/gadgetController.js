@@ -90,10 +90,10 @@ export const deleteGadget = async (req, res, next) => {
  * - Stores the confirmation code temporarily in node localStorage.
  * - Returns a response with confirmation details.
  */
-export const selfDestructGadget = (req, res, next) => {
+export const selfDestructGadget = async (req, res, next) => {
     try {
         // Trigger self-destruct and get confirmation details
-        const { message, expiresIn, code } = selfDestruct(req.params.id);
+        const { message, expiresIn, code } = await selfDestruct(req.params.id);
         // Store confirmation code in node localStorage (expires in 3 minutes)
         const timeToLive = 3 * 60 * 1000; // 3 mins
         setItemToLocalStorage('code', code, timeToLive);

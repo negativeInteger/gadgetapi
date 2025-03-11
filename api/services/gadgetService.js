@@ -138,7 +138,7 @@ export const decommission = async (id) => {
  */
 export const selfDestruct = async (id) => {
     try {
-        const gadget = await prisma.gadget.findUnique({
+        const gadget = await prisma.gadget.findUniqueOrThrow({
             where: { id }
         });
         const confirmationCode = generateConfirmationCode();
