@@ -1,3 +1,8 @@
+/**
+ * Authentication Routes
+ * - Defines the authentication endpoints for user registration, login, and logout.
+ * - Uses Swagger for API documentation.
+ */
 import express from 'express';
 import { registerUser, loginUser, logoutUser } from '../controllers/authController.js';
 

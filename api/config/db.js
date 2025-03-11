@@ -1,8 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-
+/**
+ * Prisma Client instance for database interaction.
+ */
 export const prisma = new PrismaClient();
-
-// Connect with Postgres
+/**
+ * Establishes a connection to the PostgreSQL database.
+ * If the connection fails, the application will exit with an error code.
+ */
 (async () => {
     try {
         await prisma.$connect();

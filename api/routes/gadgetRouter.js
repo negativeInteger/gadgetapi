@@ -1,3 +1,10 @@
+/**
+ * Gadget Management Routes
+ * - Provides endpoints for managing gadgets, including creation, updates, deletion, 
+ *   and a self-destruct mechanism. Uses authentication and authorization middleware 
+ *   to enforce access control.
+ * - API documentation is generated using Swagger.
+ */
 import express from 'express';
 import { 
     addGadget, 
@@ -44,7 +51,7 @@ router.get('/', authenticateUser, getGadgets);
  *     summary: Add a new gadget (Admin Only)
  *     tags: [Gadgets]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -81,7 +88,7 @@ router.post('/', authenticateUser, isAdmin, addGadget);
  *     summary: Update a gadget (Admin Only)
  *     tags: [Gadgets]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -130,7 +137,7 @@ router.patch('/:id', authenticateUser, isAdmin, updateGadget);
  *     summary: Decommission a gadget (Admin Only)
  *     tags: [Gadgets]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -157,7 +164,7 @@ router.delete('/:id', authenticateUser, isAdmin, deleteGadget);
  *     summary: Initialize self-destruction of a gadget (Admin Only)
  *     tags: [Gadgets]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -200,7 +207,7 @@ router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget)
  *     summary: Confirm gadget self-destruction (Admin Only)
  *     tags: [Gadgets]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

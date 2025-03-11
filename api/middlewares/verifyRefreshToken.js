@@ -1,9 +1,24 @@
+/**
+ * Verify Refresh Token Middleware
+ * - Handles token refreshing when access tokens expire.
+ */
 import jwt from "jsonwebtoken";
 import { isBlacklisted } from "../services/tokenService.js";
 import { generateAccessToken } from "../utils/generateTokens.js";
 import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/expirationTimes.js";
 import { ExpressError } from '../errors/ExpressError.js';
-
+/**
+ * Middleware to verify and refresh the access token using the refresh token.
+ * - If `req.triggerRefresh` is false, it skips refreshing.
+ * - If a refresh token is missing, it returns an authentication error.
+ * - It verifies the refresh token's validity.
+ * - If the token is blacklisted, it prompts the user to log in again.
+ * - A new access token is generated and set in cookies.
+ * - The user data is attached to `req.user`, and the request proceeds.
+ * @param {Object} req - Express request object containing cookies.
+ * @param {Object} res - Express response object for setting cookies.
+ * @param {Function} next - Express next function to continue or pass an error.
+ */
 export const verifyRefreshToken = async (req, res, next) => {
     if (!req.triggerRefresh) {
         return next(); // Skip refresh if access token is valid
