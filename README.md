@@ -6,6 +6,7 @@ The **Gadget API** allows users to manage gadgets efficiently. It supports full 
 ## Features
 - **User Authentication**: Secure login and registration with JWT-based authentication.
 - **Token Revocation**: Ability to revoke access tokens.
+- **Token Rotation**: Rotate refresh tokens when access token expires.
 - **CRUD Operations**: Create, read, update, and delete gadgets.
 - **Self Destruct**: Self-Destruct via confirmation code.
 - **Swagger Documentation**: API endpoints are documented with Swagger.
