@@ -14,7 +14,7 @@ import {
     removeItemFromLocalStorage 
 } from "../utils/localStorage.js";
 import { ExpressError } from "../errors/ExpressError.js";
-import { handleValidationError } from "../utils/handleValidationError.js";
+import { handleAppError } from "../utils/appError.js";
 
 /**
  * Add a new gadget.
@@ -30,8 +30,8 @@ export const addGadget = async (req, res, next) => {
         const newGadget = await create(validatedGadget);
         res.status(201).json(newGadget);
     } catch (err) {
-        // Handle validation errors
-        handleValidationError(err, next);
+        // Handle validation, database and authentication errors
+        handleAppError(err, next);
     }
 };
 
@@ -43,8 +43,9 @@ export const addGadget = async (req, res, next) => {
 export const getGadgets = async (req, res, next) => {
     try {
         // Fetch all gadgets from the database
-        const gadgets = await list(req.query);
-        res.status(200).json(gadgets);
+        const { allGadgets, total } = await list(req.query);
+        if (req.user.role === 'admin') return res.status(200).json({ allGadgets, total });
+        res.status(200).json(allGadgets);
     } catch (err) {
         next(err);
     };  
@@ -64,8 +65,8 @@ export const updateGadget = async (req, res, next) => {
         const updatedGadget = await update(validatedData, req.params.id);
         res.status(200).json(updatedGadget);
     } catch (err) {
-        // Handle validation errors
-        handleValidationError(err, next);
+        // Handle validation, database and authentication errors
+        handleAppError(err, next);
     }; 
 };
 
@@ -125,8 +126,8 @@ export const selfDestructGadgetConfirm = async (req, res, next) => {
         await deleteService(req.params.id);
         return res.status(200).json({ message: 'Gadget Deleted Successfully' }); 
     } catch (err) {
-        // Handle validation errors
-        handleValidationError(err, next);
+        // Handle validation, database and authentication errors
+        handleAppError(err, next);
     }; 
 };
 

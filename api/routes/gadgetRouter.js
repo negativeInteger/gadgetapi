@@ -30,19 +30,29 @@ const router = express.Router();
  * /api/gadgets:
  *   get:
  *     summary: Get all gadgets
+ *     description: Retrieve a list of gadgets, optionally filtered by status.
  *     tags: [Gadgets]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [AVAILABLE, DEPLOYED, DECOMMISSIONED, DESTROYED]
+ *         required: false
+ *         description: Filter gadgets by their status.
  *     responses:
  *       200:
- *         description: List all gadgets in the inventory
+ *         description: List all gadgets(specific to status if given) in the inventory
+ *       400:
+ *         description: Invalid status parameter.
  *       401:
  *         description: User must be logged in to access this resource
- *       403:
- *         description: Access Denied Admins Only
  *       500:
  *         description: Failed to retrieve gadgets
  */
+
 router.get('/', authenticateUser, getGadgets);
 /**
  * @swagger

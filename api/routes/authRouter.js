@@ -5,6 +5,7 @@
  */
 import express from 'express';
 import { registerUser, loginUser, logoutUser } from '../controllers/authController.js';
+import { handleReLogin } from '../middlewares/handleReLogin.js';
 
 const router = express.Router();
 
@@ -84,11 +85,11 @@ router.post('/register', registerUser);
  *       200:
  *         description: Hey john_doe, Login Successful
  *       400:
- *         description: Validation Error
+ *         description: Validation Error / Authentication (Already Logged In)
  *       401:
  *         description: Invalid Credentials
  */
-router.post('/login', loginUser);
+router.post('/login', handleReLogin, loginUser);
 
 /**
  * @swagger
@@ -97,7 +98,7 @@ router.post('/login', loginUser);
  *     summary: Log out a user
  *     tags: [Authentication]
  *     security:
- *       - BearerAuth: []
+ *       - CookieAuth: []
  *     responses:
  *       200:
  *         description: Logged Out Successfully!

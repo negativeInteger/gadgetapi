@@ -5,9 +5,9 @@
  */
 import { prisma } from '../config/db.js';
 import { hashPassword, comparePassword } from '../utils/hash.js';
-import { generateAccessToken, generateRefreshToken } from '../utils/generateTokens.js';
+import { generateAccessToken, generateRefreshToken } from '../utils/tokens.js';
 import { saveRefreshToken } from '../services/tokenService.js';
-import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/expirationTimes.js';
+import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/constants.js';
 import { ExpressError } from '../errors/ExpressError.js';
 /**
  * Register a new user.

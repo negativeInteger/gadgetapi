@@ -5,7 +5,6 @@
 class ExpressError extends Error {
     /**
      * Constructs an ExpressError instance.
-     * 
      * @param {string} errorType - The type of error (e.g., "Validation", "Authentication").
      * @param {string} message - A descriptive error message.
      * @param {number} statusCode - The HTTP status code for the error response.

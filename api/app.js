@@ -8,19 +8,58 @@ import { gadgetRouter } from './routes/gadgetRouter.js'
 import { errorHandler } from './errors/errorHandler.js';
 import { setupSwagger } from './config/swagger.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
-dotenv.config();
 
+// Load environment variables only in non-production environments
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
+  
 const app = express();
+// node-localstorage for storing self-destruct sequence confirmation codes
 const localStorage = new LocalStorage("./codes"); 
 
-setupSwagger(app); // Initialize Swagger docs
+// Security Middleware
 app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
+
+// Setup Swagger API documentation (only in development)
+if (process.env.NODE_ENV !== "production") {
+    setupSwagger(app);
+}
+
+
+// Routes
+app.get("/", (req, res) => {
+    res.json({
+        message: "Welcome to the Gadget API",
+        documentation: "/docs",
+        routes: {
+            auth: {
+                register: "POST /api/auth/register",
+                login: "POST /api/auth/login",
+                refresh: "POST /api/auth/refresh"
+            },
+            gadgets: {
+                list: "GET /api/gadgets",
+                create: "POST /api/gadgets (User-only)",
+                update: "PATCH /api/gadgets/{id} (Admin-only)",
+                delete: "DELETE /api/gadgets/{id} (Admin-only, sets status to decommissioned)",
+                selfDestruct: {
+                    initiate: "POST /api/gadgets/{id}/self-destruct (Admin-only, returns confirmationCode)",
+                    confirm: "POST /api/gadgets/{id}/self-destruct/confirm (Admin-only, deletes permanently)"
+                }
+            }
+        }
+    });
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/gadgets', gadgetRouter);
+
 // Handle undefined routes
 app.use(notFoundHandler)
+
 // Global error handler
 app.use(errorHandler)
 

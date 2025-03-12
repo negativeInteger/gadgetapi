@@ -2,7 +2,6 @@
  * Not Found Handler Middleware
  * - Catches undefined routes and returns a 404 error.
  */
-
 import { ExpressError } from "../errors/ExpressError.js";
 /**
  * Middleware to handle requests to non-existent routes.

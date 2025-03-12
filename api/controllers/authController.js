@@ -3,7 +3,7 @@ import { registerSchema, loginSchema } from "../validations/authValidation.js";
 import { blacklistToken } from '../services/tokenService.js';
 import { setCookies, clearCookies } from '../utils/cookie.js';
 import { ExpressError } from '../errors/ExpressError.js';
-import { handleValidationError } from '../utils/handleValidationError.js';
+import { handleAppError } from '../utils/appError.js';
 
 /**
  * Register a new user.
@@ -19,8 +19,8 @@ export const registerUser = async (req, res, next) => {
         await register(validatedData);
         return res.status(201).json({ message: `Registration Success!, Hey ${validatedData.username}, you can login now` });
     } catch (err) {
-        // Handle validation errors
-        handleValidationError(err, next);
+        // Handle validation, database and authentication errors
+        handleAppError(err, next);
     }
 };
 
@@ -44,8 +44,8 @@ export const loginUser = async (req, res, next) => {
         setCookies(res, accessToken, refreshToken);
         res.status(200).json({ message: `Hey ${validatedData.username}, Login Successful` });
     } catch (err) {
-        // Handle validation errors
-        handleValidationError(err, next);
+        // Handle validation, database and authentication errors
+        handleAppError(err, next);
     }
 };
 
@@ -68,7 +68,6 @@ export const logoutUser = async (req, res, next) => {
         clearCookies(res);
         return res.status(200).json({ message: 'Logged Out Successfully!'})
     } catch (err) {
-        console.error("Logout error:", err);
         next(new ExpressError('Internal Server Error', 'Error occurred while logging out', 500));
     }
 };

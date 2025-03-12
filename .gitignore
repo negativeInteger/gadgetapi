@@ -3,3 +3,4 @@ checkpoints.txt
 .env
 .env.test
 codes
+prisma/migrations

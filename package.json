@@ -4,7 +4,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "server": "nodemon ./api/server.js",
+    "server": "node ./api/server.js",
     "pretest": "npx prisma migrate deploy --env-file .env.test",
     "test": "jest --setupFilesAfterEnv=api/tests/setup.js"
   },

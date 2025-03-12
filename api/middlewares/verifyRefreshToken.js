@@ -4,8 +4,8 @@
  */
 import jwt from "jsonwebtoken";
 import { isBlacklisted } from "../services/tokenService.js";
-import { generateAccessToken } from "../utils/generateTokens.js";
-import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/expirationTimes.js";
+import { generateAccessToken } from "../utils/tokens.js";
+import { ACCESS_TOKEN_EXPIRE_TIME } from "../config/constants.js";
 import { ExpressError } from '../errors/ExpressError.js';
 /**
  * Middleware to verify and refresh the access token using the refresh token.
@@ -34,7 +34,7 @@ export const verifyRefreshToken = async (req, res, next) => {
         const accessToken = generateAccessToken(user);
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV !== "development",
+            secure: process.env.NODE_ENV === 'production',
             sameSite: "Strict",
             maxAge: ACCESS_TOKEN_EXPIRE_TIME
         });

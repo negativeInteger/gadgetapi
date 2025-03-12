@@ -6,8 +6,8 @@
 import { prisma } from "../config/db.js";
 import { generateCodename } from "../utils/codename.js";
 import { ExpressError } from "../errors/ExpressError.js";
-import { generateConfirmationCode } from "../utils/generateConfirmationCode.js";
-import { calculateMissionSuccessProbability } from "../utils/successProbability.js";
+import { generateConfirmationCode } from "../utils/confirmationCode.js";
+import { generateMissionSuccessProbability } from "../utils/missionSuccessProbability.js";
 
 /**
  * Create Gadget Service
@@ -47,7 +47,10 @@ export const create = async ({ name, description, status }) => {
  */
 export const list = async ({ page = 1, limit = 10, status }) => {
     const where = status ? { status } : {};
-    
+    // Check if status is valid
+    const validStatuses = ['AVAILABLE', 'DEPLOYED', 'DECOMMISSIONED', 'DESTROYED'];
+    if (status && !validStatuses.includes(status)) throw new ExpressError('Validation Error', 'Invalid status parameter', 400);
+
     const gadgets = await prisma.gadget.findMany({
         where,
         skip: (page - 1) * limit,
@@ -58,9 +61,9 @@ export const list = async ({ page = 1, limit = 10, status }) => {
     const total = await prisma.gadget.count({ where });
     const gadgetsWithSuccessProbability = gadgets.map(gadget =>({
         ...gadget,
-        missionSuccessProbability: calculateMissionSuccessProbability(gadget)
+        missionSuccessProbability: generateMissionSuccessProbability(gadget.status)
     }));
-    return { gadgetsWithSuccessProbability, total };
+    return { allGadgets: gadgetsWithSuccessProbability, total };
 };
 /**
  * Update Gadget Service
