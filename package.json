@@ -4,9 +4,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "server": "node ./api/server.js",
-    "pretest": "npx prisma migrate deploy --env-file .env.test",
-    "test": "jest --setupFilesAfterEnv=api/tests/setup.js"
+    "start": "node ./api/server.js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +24,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0",
+    "winston": "^3.17.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

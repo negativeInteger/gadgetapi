@@ -33,26 +33,45 @@ export const create = async ({ name, description }) => {
     return newGadget; 
 };
 /**
- * List Gadgets Service
- * - Retrieves a paginated list of gadgets with optional filtering by status.
+ * Retrieve a paginated list of gadgets based on the user's role and optional status filter.
+ * - Admins can filter by any status or retrieve all gadgets.
+ * - Users can only see "AVAILABLE" and "DEPLOYED" gadgets.
+ * - If invalid status parameter is provided it is ignored.
+ * - Supports pagination with `page` and `limit` parameters.
+ * - Orders results by `createdAt` in descending order.
+ * - Adds a `missionSuccessProbability` field to each gadget.
  * @param {Object} options - Query parameters for pagination and filtering.
- * @param {number} [options.page=1] - Page number.
+ * @param {number} [options.page=1] - Page number for pagination.
  * @param {number} [options.limit=10] - Number of items per page.
- * @param {string} [options.status] - Filter gadgets by status.
- * @returns {Promise<Object>} An object containing gadgets and total count.
- * @throws {ExpressError} If retrieval fails.
+ * @param {string} [options.status] - Optional status filter.
+ * @param {string} role - Role of the requesting user (either "ADMIN" or "USER").
+ * @returns {Promise<{ allGadgets: Object[], total: number }>} An object containing the list of gadgets and total count.
+ * @throws {ExpressError} In case of Database Errors
  */
-export const list = async ({ page = 1, limit = 10, status }) => {
+export const list = async ({ page = 1, limit = 10, status }, role) => {
     // Avoid zero or negative values
     page = Math.max(parseInt(page, 10), 1);
     limit = Math.max(parseInt(limit, 10), 1);
     // Check if limit is greater than total gadgets
     const totalRecords = await prisma.gadget.count();
     const skip = (page - 1) * limit;
-    const where = status ? { status } : {};
-    // Check if status is valid
-    const validStatuses = ['AVAILABLE', 'DEPLOYED', 'DECOMMISSIONED', 'DESTROYED'];
-    if (status && !validStatuses.includes(status)) throw new ExpressError('Validation Error', 'Invalid status parameter', 400);
+    let where = {};
+    if (role === 'USER') {
+        // Users can only see AVAILABLE and DEPLOYED
+        const allowedStatuses = ['AVAILABLE', 'DEPLOYED'];
+        // If a valid status is provided, filter by it, otherwise show both
+        where.status = status && allowedStatuses.includes(status) 
+            ? status 
+            : { in: allowedStatuses };
+    } else {
+        // Admins can see everything and filter by any valid status
+        const validStatuses = ['AVAILABLE', 'DEPLOYED', 'DECOMMISSIONED', 'DESTROYED'];
+        if (status && !validStatuses.includes(status)) {
+            status = undefined; // Ignore invalid status and return all gadgets
+        }
+        where = status ? { status } : {};
+    }
+    // Fetch gadgets
     const gadgets = await prisma.gadget.findMany({
         where,
         skip: skip >= totalRecords ? 0 : skip,
@@ -60,8 +79,9 @@ export const list = async ({ page = 1, limit = 10, status }) => {
         orderBy: { createdAt: 'desc' }
     });
     if (!gadgets) throw new ExpressError('Internal Server Error', 'Failed to retrieve gadgets', 500);
-    const total = await prisma.gadget.count({ where });
-    const gadgetsWithSuccessProbability = gadgets.map(gadget =>({
+    const total = role === 'ADMIN' ? await prisma.gadget.count({ where }) : undefined;
+    // Add mission success probability to each gadget
+    const gadgetsWithSuccessProbability = gadgets.map(gadget => ({
         ...gadget,
         missionSuccessProbability: generateMissionSuccessProbability(gadget.status)
     }));
@@ -80,7 +100,6 @@ export const list = async ({ page = 1, limit = 10, status }) => {
  */
 export const update = async (data, id) => {
     try {
-        if (data.status === 'DECOMMISSIONED') data.decommissionedAt = new Date(Date.now()).toISOString();
         const updatedGadget = await prisma.gadget.update({
             where: { id },
             data
@@ -92,24 +111,6 @@ export const update = async (data, id) => {
         }
         throw new ExpressError("Internal Server Error", "Failed to update gadget", 500);
     };    
-};
-/**
- * Delete Gadget Service (Permanent Deletion)
- * - Removes a gadget from the database permanently.
- * @param {string} id - Gadget ID.
- * @throws {ExpressError} If gadget is not found or deletion fails.
- */
-export const deleteService = async (id) => {
-    try {
-        await prisma.gadget.delete({
-            where: { id }   
-        });
-    } catch (err) {
-        if (err.code === "P2025") {  // Prisma error code if gadget-id not found
-            throw new ExpressError("Not Found", "Gadget not found", 404);
-        }
-        throw new ExpressError("Internal Server Error", "Failed to delete gadget", 500);
-    };
 };
 /**
  * Decommission Gadget Service

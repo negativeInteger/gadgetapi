@@ -16,5 +16,5 @@ export const isAdmin = (req, res, next) => {
     if(req.user.role !== 'ADMIN') {
         next(new ExpressError('Authorization', 'Access Denied: Admins Only', 403));
     }
-    next(); // Process if user is Admin
+    next(); // Process if user is ADMIN
 };

@@ -30,7 +30,12 @@ const router = express.Router();
  * /api/gadgets:
  *   get:
  *     summary: Get all gadgets
- *     description: Retrieve a list of gadgets, optionally filtered by status, with pagination.
+ *     description: |
+ *       Retrieve a list of gadgets, optionally filtered by status, with pagination.
+ *       - **Admins**: Can see all gadgets and filter by any status.
+ *         - If an invalid status is provided, the filter is ignored, and all gadgets are returned.
+ *       - **Users**: Can only see "AVAILABLE" and "DEPLOYED" gadgets.
+ *         - If a user tries to filter by an invalid status, they will still see "AVAILABLE" and "DEPLOYED".
  *     tags: [Gadgets]
  *     security:
  *       - CookieAuth: []
@@ -41,7 +46,9 @@ const router = express.Router();
  *           type: string
  *           enum: [AVAILABLE, DEPLOYED, DECOMMISSIONED, DESTROYED]
  *         required: false
- *         description: Filter gadgets by their status.
+ *         description: |
+ *           - **Admins**: Can filter by any status. If an invalid status is provided, it is ignored.
+ *           - **Users**: Can only filter by "AVAILABLE" or "DEPLOYED". If an invalid status is provided, they will still see both.
  *       - in: query
  *         name: page
  *         schema:
@@ -59,8 +66,6 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: List of gadgets (filtered by status if provided), paginated.
- *       400:
- *         description: Invalid query parameters.
  *       401:
  *         description: User must be logged in to access this resource.
  *       500:
@@ -269,7 +274,7 @@ router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget)
  *             properties:
  *               code:
  *                 type: string
- *                 example: "123456"
+ *                 example: "923783"
  *     responses:
  *       200:
  *         content:

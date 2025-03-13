@@ -20,6 +20,7 @@ import { handleAppError } from "../utils/appError.js";
  * Add a new gadget.
  * - Validates request body.
  * - Calls `create` service to store gadget.
+ * - Status is set to 'AVAILABLE' by default
  * - Returns created gadget data.
  */
 export const addGadget = async (req, res, next) => {
@@ -36,20 +37,24 @@ export const addGadget = async (req, res, next) => {
 };
 
 /**
- * Retrieve all gadgets from the database.
- * - Calls `list` service with/without query parameter `status`.
+ * Fetch gadgets based on the user's role and query parameters.
+ * - Calls the `list` service with query parameters.
+ * - Admins can filter by any status and receive the total count.
+ * - Users can only see "AVAILABLE" and "DEPLOYED" gadgets.
  * - Returns an array of gadgets.
  */
 export const getGadgets = async (req, res, next) => {
     try {
-        // Fetch all gadgets from the database
-        const { allGadgets, total } = await list(req.query);
-        if (req.user.role === 'ADMIN') return res.status(200).json({ allGadgets, total });
-        res.status(200).json(allGadgets);
+        const role = req.user.role;
+        // Fetch gadgets based on the role and query parameters
+        const { allGadgets, total } = await list(req.query, role);
+        // Admins get the total count, users don't
+        res.status(200).json(role === 'ADMIN' ? { allGadgets, total } : { allGadgets });
     } catch (err) {
         next(err);
-    };  
+    }
 };
+
 
 /**
  * Update an existing gadget.

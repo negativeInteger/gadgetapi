@@ -87,7 +87,7 @@ router.post('/register', registerUser);
  *       400:
  *         description: Validation Error / Authentication (Already Logged In)
  *       401:
- *         description: Invalid Credentials
+ *         description: Invalid Credentials / Inavlid Session. Please login again
  */
 router.post('/login', handleReLogin, loginUser);
 

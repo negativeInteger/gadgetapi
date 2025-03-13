@@ -14,8 +14,8 @@ const options = {
       },
       servers: [
         {
-          url: "http://localhost:3000",
-          description: "Local server",
+          url: process.env.BASE_URL || "http://localhost:3000",
+          description: process.env.NODE_ENV === "production" ? "Production server" : "Local server",
         },
       ],
       components: {
@@ -37,8 +37,12 @@ const options = {
  */
 const swaggerSpec = swaggerJsdoc(options);
 const setupSwagger = (app) => {
+  const serverUrl = process.env.BASE_URL || "http://localhost:3000"; 
+  swaggerSpec.servers = [{ url: serverUrl, description: "API Server" }];
+  // Serve Swagger UI
   app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { swaggerOptions: { withCredentials: true } }));
-  console.log("📄 Swagger docs available at http://localhost:3000/docs");
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`📄 Swagger docs available at ${serverUrl}/docs`);
+  }
 };
-
 export { setupSwagger };
