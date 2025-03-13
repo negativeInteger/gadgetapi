@@ -23,13 +23,25 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 
-// Setup Swagger API documentation (only in development)
-if (process.env.NODE_ENV !== "production") {
-    setupSwagger(app);
-}
+// Setup Swagger API documentation
+setupSwagger(app);
 
 
 // Routes
+app.get("/", (req, res) => {
+    res.send(`
+      <html>
+        <head>
+          <title>Gadget API</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1>Gadget API</h1>
+          <p>Welcome to the Gadget API! Everything is running smoothly. ✅</p>
+          <p>Check the <a href="/docs">API Documentation</a> for details.</p>
+        </body>
+      </html>
+    `);
+});
 app.use('/api/auth', authRouter);
 app.use('/api/gadgets', gadgetRouter);
 
