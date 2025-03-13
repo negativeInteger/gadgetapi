@@ -55,9 +55,10 @@ const router = express.Router();
  *         description: Validation Error
  *       409:
  *         description: Username is already registered
+ *       500:
+ *         description: An error occurred while registering user
  */
 router.post('/register', registerUser);
-
 /**
  * @swagger
  * /api/auth/login:

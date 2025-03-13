@@ -21,8 +21,9 @@ import { ExpressError } from '../errors/ExpressError.js';
  * @param {string} [data.role] - Optional user role (default: 'USER')
  * @throws {ExpressError} If the username is already registered
  */
+
 export const register = async (data) => {
-    const  { username, password } = data;
+    const { username, password } = data;
     const hashedPassword = await hashPassword(password);
     try {
         const user = await prisma.user.create({
@@ -31,9 +32,14 @@ export const register = async (data) => {
                 password: hashedPassword,
                 role: data.role || 'USER'
             }
-        }); 
+        });
+        return user;
     } catch (err) {
-        throw new ExpressError('Conflict', 'Username is already registered', 409);
+        // if the username already exists
+        if (err instanceof PrismaClientKnownRequestError && err.code === 'P2002') {
+            throw new ExpressError('Conflict', 'Username is already registered', 409);
+        }
+        throw new ExpressError('Internal Server Error', 'An error occurred while registering user', 500);
     }
 };
 /**

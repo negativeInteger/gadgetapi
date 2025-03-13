@@ -4,5 +4,5 @@ checkpoints.txt
 .env.test
 codes
 prisma/migrations
-prisma/seed.js
+seed.js
 logs/
