@@ -1,12 +1,12 @@
 import { 
      create,
      list, 
-     decommission, 
      update, 
-     selfDestruct, 
-     deleteService 
+     decommission, 
+     selfDestruct,  
+     destroy
 } from "../services/gadgetService.js";
-import { gadgetSchema } from "../validations/gadgetValidation.js";
+import { createGadgetSchema, updateGadgetSchema } from "../validations/gadgetValidation.js";
 import { confirmationCodeSchema } from "../validations/confirmationCodeSchema.js";
 import { 
     setItemToLocalStorage, 
@@ -25,7 +25,7 @@ import { handleAppError } from "../utils/appError.js";
 export const addGadget = async (req, res, next) => {
     try {
         // Validate incoming request body
-        const validatedGadget = gadgetSchema.parse(req.body);
+        const validatedGadget = createGadgetSchema.parse(req.body);
         // Store gadget in the database
         const newGadget = await create(validatedGadget);
         res.status(201).json(newGadget);
@@ -44,7 +44,7 @@ export const getGadgets = async (req, res, next) => {
     try {
         // Fetch all gadgets from the database
         const { allGadgets, total } = await list(req.query);
-        if (req.user.role === 'admin') return res.status(200).json({ allGadgets, total });
+        if (req.user.role === 'ADMIN') return res.status(200).json({ allGadgets, total });
         res.status(200).json(allGadgets);
     } catch (err) {
         next(err);
@@ -60,7 +60,7 @@ export const getGadgets = async (req, res, next) => {
 export const updateGadget = async (req, res, next) => {
     try {
         // Validate request body
-        const validatedData = gadgetSchema.parse(req.body);
+        const validatedData = updateGadgetSchema.parse(req.body);
         // Update gadget with new data
         const updatedGadget = await update(validatedData, req.params.id);
         res.status(200).json(updatedGadget);
@@ -75,11 +75,11 @@ export const updateGadget = async (req, res, next) => {
  * - Calls `decommission` service to mark the gadget's status as DECOMMISSIONED.
  * - Returns the updated gadget.
  */
-export const deleteGadget = async (req, res, next) => {
+export const decommissionGadget = async (req, res, next) => {
     try {
         // Mark gadget as decommissioned (soft delete)
-        const deletedGadget = await decommission(req.params.id);
-        res.status(200).json(deletedGadget);
+        const decommissionedGadget = await decommission(req.params.id);
+        res.status(200).json(decommissionedGadget);
     } catch (err) {
         next(err);
     }; 
@@ -108,9 +108,9 @@ export const selfDestructGadget = async (req, res, next) => {
  * Confirm and execute self-destruct.
  * - Validates confirmation code from request body.
  * - Checks if the stored confirmation code matches.
- * - Deletes the gadget permanently if the code is valid.
+ * - Marks the gadget's status as DESTROYED
  */
-export const selfDestructGadgetConfirm = async (req, res, next) => {
+export const destroyGadget = async (req, res, next) => {
     try {
         // Validate the confirmation code in request body
         const validatedData = confirmationCodeSchema.parse(req.body);
@@ -122,9 +122,9 @@ export const selfDestructGadgetConfirm = async (req, res, next) => {
         if (!isValidCode) throw new ExpressError('Bad Request', 'Incorrect Confirmation Code', 401);
         // Remove the confirmation code from local storage
         removeItemFromLocalStorage('code');
-        // Permanently delete the gadget
-        await deleteService(req.params.id);
-        return res.status(200).json({ message: 'Gadget Deleted Successfully' }); 
+        // Mark the gadget as DESTROYED
+        const destroyedGadget = await destroy(req.params.id);
+        return res.status(200).json(destroyedGadget); 
     } catch (err) {
         // Handle validation, database and authentication errors
         handleAppError(err, next);

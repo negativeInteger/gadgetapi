@@ -11,7 +11,7 @@ model User {
   id        String     @id @default(uuid())           // UUID
   username  String     @unique                        // unique username
   password  String                                    // hashed password
-  role      Role       @default(user)                 // Role-Based-Access (user/admin)
+  role      Role       @default(USER)                 // Role-Based-Access (user/admin)
   createdAt DateTime   @default(now())
 }
 
@@ -19,7 +19,7 @@ model Gadget {
   id                String        @id @default(uuid())
   name              String  
   codename          String        @unique
-  description       String
+  description       String        @default("No description provided")
   status            GadgetStatus  @default(AVAILABLE)          
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -40,8 +40,8 @@ model RefreshToken {
 }
 
 enum Role {
-  user
-  admin
+  USER
+  ADMIN
 }
 
 enum GadgetStatus {

@@ -1,22 +1,28 @@
-import { z } from 'zod';
+import { z } from "zod";
 /**
- * Schema for validating a gadget.
- * - `name`: A string with a minimum length of 2 characters.
- * - `description`: A string with a minimum length of 2 characters.
- * - `status`: Must be one of the predefined statuses:
- *    - `AVAILABLE`
- *    - `DEPLOYED`
- *    - `DESTROYED`
- *    - `DECOMMISSIONED`
- *   Defaults to `AVAILABLE` if not provided.
+ * Schema for creating a new gadget.
+ * Ensures that:
+ * - `name` is a required string with a minimum length of 3.
+ * - `description` is an optional string with a minimum length of 4, defaulting to "No description provided".
  */
-export const gadgetSchema = z.object({
-    name: z.string().min(2),
-    description: z.string().min(2),
-    status: z.enum([
-        'AVAILABLE',
-        'DEPLOYED',
-        'DESTROYED',
-        'DECOMMISSIONED'
-    ]).default('AVAILABLE')
+export const createGadgetSchema = z.object({
+    name: z.string().min(3),
+    description: z.string().min(4).optional().default('No description provided'),
 }).strict();
+/**
+ * Schema for updating an existing gadget.
+ * Ensures that:
+ * - `name` is an optional string with a minimum length of 3.
+ * - `description` is an optional string with a minimum length of 4.
+ * - `status` is an optional enum with allowed values: "AVAILABLE", "DEPLOYED", "DESTROYED", or "DECOMMISSIONED".
+ * - At least one of `name`, `description`, or `status` must be provided.
+ */
+export const updateGadgetSchema = z.object({
+    name: z.string().min(3).optional(),
+    description: z.string().min(4).optional(),
+    status: z.enum(["AVAILABLE", "DEPLOYED", "DESTROYED", "DECOMMISSIONED"]).optional(),
+})
+.strict()
+.refine((data) => Object.keys(data).length > 0, {
+        message: "At least one field (name, description, or status) must be provided.",
+});

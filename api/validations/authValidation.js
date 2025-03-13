@@ -7,8 +7,8 @@ import { z } from 'zod';
  */
 export const registerSchema = z.object({
     username: z.string().min(3).max(20),
-    password: z.string().min(6),
-    role:     z.enum(['user', 'admin']).optional()
+    password: z.string().min(8),
+    role:     z.enum(['USER', 'ADMIN']).optional().default('USER')
 }).strict();
 
 /**
@@ -18,5 +18,5 @@ export const registerSchema = z.object({
  */
 export const loginSchema = z.object({
     username: z.string().min(3).max(20),
-    password: z.string().min(6)
+    password: z.string().min(8)
 }).strict();

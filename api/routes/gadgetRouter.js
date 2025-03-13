@@ -7,12 +7,12 @@
  */
 import express from 'express';
 import { 
-    addGadget, 
-    deleteGadget, 
     getGadgets, 
+    addGadget, 
+    updateGadget,
+    decommissionGadget,
     selfDestructGadget,
-    selfDestructGadgetConfirm, 
-    updateGadget 
+    destroyGadget 
 } from '../controllers/gadgetController.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 import { authenticateUser } from  '../middlewares/authenticateUser.js';
@@ -30,7 +30,7 @@ const router = express.Router();
  * /api/gadgets:
  *   get:
  *     summary: Get all gadgets
- *     description: Retrieve a list of gadgets, optionally filtered by status.
+ *     description: Retrieve a list of gadgets, optionally filtered by status, with pagination.
  *     tags: [Gadgets]
  *     security:
  *       - CookieAuth: []
@@ -42,17 +42,30 @@ const router = express.Router();
  *           enum: [AVAILABLE, DEPLOYED, DECOMMISSIONED, DESTROYED]
  *         required: false
  *         description: Filter gadgets by their status.
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         required: false
+ *         description: Page number for pagination (default is 1).
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         required: false
+ *         description: Number of gadgets per page (default is 10).
  *     responses:
  *       200:
- *         description: List all gadgets(specific to status if given) in the inventory
+ *         description: List of gadgets (filtered by status if provided), paginated.
  *       400:
- *         description: Invalid status parameter.
+ *         description: Invalid query parameters.
  *       401:
- *         description: User must be logged in to access this resource
+ *         description: User must be logged in to access this resource.
  *       500:
- *         description: Failed to retrieve gadgets
+ *         description: Failed to retrieve gadgets.
  */
-
 router.get('/', authenticateUser, getGadgets);
 /**
  * @swagger
@@ -75,10 +88,7 @@ router.get('/', authenticateUser, getGadgets);
  *               description:
  *                 type: string
  *                 example: "A high-tech wearable gadget"
- *               status:
- *                 type: string
- *                 enum: [AVAILABLE, DEPLOYED, DESTROYED, DECOMMISSIONED]
- *                 example: AVAILABLE
+ *                 default: "No description provided"
  *     responses:
  *       201:
  *         description: Gadget created successfully
@@ -90,7 +100,6 @@ router.get('/', authenticateUser, getGadgets);
  *         description: Access Denied - Admins Only
  */
 router.post('/', authenticateUser, isAdmin, addGadget);
-
 /**
  * @swagger
  * /api/gadgets/{id}:
@@ -123,7 +132,8 @@ router.post('/', authenticateUser, isAdmin, addGadget);
  *               status:
  *                 type: string
  *                 enum: [AVAILABLE, DEPLOYED, DESTROYED, DECOMMISSIONED]
- *                 example: "Updated Status"
+ *                 example: "DEPLOYED"
+ *             minProperties: 1 
  *     responses:
  *       200:
  *         description: Gadget updated successfully
@@ -138,7 +148,6 @@ router.post('/', authenticateUser, isAdmin, addGadget);
  *       500:
  *         description: Failed to update gadget
  */
-
 router.patch('/:id', authenticateUser, isAdmin, updateGadget);
 /**
  * @swagger
@@ -158,7 +167,32 @@ router.patch('/:id', authenticateUser, isAdmin, updateGadget);
  *         description: Gadget ID
  *     responses:
  *       200:
- *         description: Gadget deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 name:
+ *                   type: string
+ *                   example: "Spy Camera"
+ *                 codename:
+ *                   type: string
+ *                   example: "IMF-ABKS6HBGFS"
+ *                 description:
+ *                   type: string
+ *                   example: "A hidden surveillance device"
+ *                 status:
+ *                   type: string
+ *                   enum: [DECOMMISSIONED]
+ *                   example: "DECOMMISSIONED"
+ *                 decommissionedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-03-13T12:00:00Z"
  *       401:
  *         description: User must be logged in to access this resource
  *       403:
@@ -166,7 +200,7 @@ router.patch('/:id', authenticateUser, isAdmin, updateGadget);
  *       404:
  *         description: Gadget not found
  */
-router.delete('/:id', authenticateUser, isAdmin, deleteGadget);
+router.delete('/:id', authenticateUser, isAdmin, decommissionGadget);
 /**
  * @swagger
  * /api/gadgets/{id}/self-destruct:
@@ -238,7 +272,32 @@ router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget)
  *                 example: "123456"
  *     responses:
  *       200:
- *         description: Gadget deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 name:
+ *                   type: string
+ *                   example: "Spy Camera"
+ *                 codename:
+ *                   type: string
+ *                   example: "IMF-ABKS6HBGFS"
+ *                 description:
+ *                   type: string
+ *                   example: "A hidden surveillance device"
+ *                 status:
+ *                   type: string
+ *                   enum: [DESTROYED]
+ *                   example: "DESTROYED"
+ *                 decommissionedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-03-13T12:00:00Z"
  *       400:
  *         description: Validation Error / Incorrect Confirmation Code
  *       401:
@@ -248,8 +307,8 @@ router.post('/:id/self-destruct', authenticateUser, isAdmin, selfDestructGadget)
  *       404:
  *         description: Gadget not found
  *       500:
- *         description: Failed to delete gadget
+ *         description: Failed to destroy gadget
  */
-router.post('/:id/self-destruct/confirm', authenticateUser, isAdmin, selfDestructGadgetConfirm);
+router.post('/:id/self-destruct/confirm', authenticateUser, isAdmin, destroyGadget);
 
 export { router as gadgetRouter };

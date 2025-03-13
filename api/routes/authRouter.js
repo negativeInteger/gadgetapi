@@ -38,7 +38,7 @@ const router = express.Router();
  *                 example: "Password123!"
  *               role:
  *                 type: string
- *                 enum: [user, admin]
+ *                 enum: [USER, ADMIN]
  *                 description: |
  *                  Defines the user's access level within the system.
  *                      - `user`: Standard user with limited access.

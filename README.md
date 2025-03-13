@@ -50,7 +50,7 @@ npm start
 {
   "username": "john_doe",
   "password": "securepassword"
-  "role": "admin"
+  "role": "ADMIN"
 }
 ```
 **Response:**

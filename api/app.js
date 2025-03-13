@@ -30,30 +30,6 @@ if (process.env.NODE_ENV !== "production") {
 
 
 // Routes
-app.get("/", (req, res) => {
-    res.json({
-        message: "Welcome to the Gadget API",
-        documentation: "/docs",
-        routes: {
-            auth: {
-                register: "POST /api/auth/register",
-                login: "POST /api/auth/login",
-                refresh: "POST /api/auth/refresh"
-            },
-            gadgets: {
-                list: "GET /api/gadgets",
-                create: "POST /api/gadgets (User-only)",
-                update: "PATCH /api/gadgets/{id} (Admin-only)",
-                delete: "DELETE /api/gadgets/{id} (Admin-only, sets status to decommissioned)",
-                selfDestruct: {
-                    initiate: "POST /api/gadgets/{id}/self-destruct (Admin-only, returns confirmationCode)",
-                    confirm: "POST /api/gadgets/{id}/self-destruct/confirm (Admin-only, deletes permanently)"
-                }
-            }
-        }
-    });
-});
-
 app.use('/api/auth', authRouter);
 app.use('/api/gadgets', gadgetRouter);
 

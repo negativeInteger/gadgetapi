@@ -19,14 +19,14 @@ import { generateMissionSuccessProbability } from "../utils/missionSuccessProbab
  * @returns {Promise<Object>} The newly created gadget.
  * @throws {ExpressError} If gadget creation fails.
  */
-export const create = async ({ name, description, status }) => {
+export const create = async ({ name, description }) => {
     const codename = generateCodename();
     const newGadget = await prisma.gadget.create({
         data: {
             name,
             codename,
             description,
-            status
+            status: 'AVAILABLE'
         }
     });
     if (!newGadget) throw new ExpressError('Internal Server Error', 'Gadget Creation Failed', 500);
@@ -43,14 +43,20 @@ export const create = async ({ name, description, status }) => {
  * @throws {ExpressError} If retrieval fails.
  */
 export const list = async ({ page = 1, limit = 10, status }) => {
+    // Avoid zero or negative values
+    page = Math.max(parseInt(page, 10), 1);
+    limit = Math.max(parseInt(limit, 10), 1);
+    // Check if limit is greater than total gadgets
+    const totalRecords = await prisma.gadget.count();
+    const skip = (page - 1) * limit;
     const where = status ? { status } : {};
     // Check if status is valid
     const validStatuses = ['AVAILABLE', 'DEPLOYED', 'DECOMMISSIONED', 'DESTROYED'];
     if (status && !validStatuses.includes(status)) throw new ExpressError('Validation Error', 'Invalid status parameter', 400);
     const gadgets = await prisma.gadget.findMany({
         where,
-        skip: (page - 1) * limit,
-        take: limit,
+        skip: skip >= totalRecords ? 0 : skip,
+        take: skip >= totalRecords ? totalRecords : limit,
         orderBy: { createdAt: 'desc' }
     });
     if (!gadgets) throw new ExpressError('Internal Server Error', 'Failed to retrieve gadgets', 500);
@@ -72,11 +78,12 @@ export const list = async ({ page = 1, limit = 10, status }) => {
  * @returns {Promise<Object>} The updated gadget.
  * @throws {ExpressError} If gadget is not found or update fails.
  */
-export const update = async ({ name, description, status }, id) => {
+export const update = async (data, id) => {
     try {
+        if (data.status === 'DECOMMISSIONED') data.decommissionedAt = new Date(Date.now()).toISOString();
         const updatedGadget = await prisma.gadget.update({
             where: { id },
-            data: { name, description, status }
+            data
         });
         return updatedGadget;
     } catch (err) {
@@ -154,3 +161,24 @@ export const selfDestruct = async (id) => {
         throw new ExpressError("Internal Server Error", "Failed to initiate self-destruct", 500);
     }
 };
+/**
+ * Destroy Gadget Service (Confirm Self-Destruct Gadget)
+ * - Finalizes the self-destruction process by marking the gadget as 'DESTROYED'.
+ * @param {string} id - Gadget ID.
+ * @returns {Promise<Object>} The destroyed gadget.
+ * @throws {ExpressError} If gadget is not found or update fails.
+ */
+export const destroy = async (id) => {
+    try {
+        const destroyedGadget = await prisma.gadget.update({
+            where: { id },
+            data: { status: 'DESTROYED' }
+        });
+        return destroyedGadget;
+    } catch (err) {
+        if (err.code === "P2025") {  // Prisma error code if gadget-id not found
+            throw new ExpressError("Not Found", "Gadget not found", 404);
+        }
+        throw new ExpressError("Internal Server Error", "Failed to destroy gadget", 500);
+    }
+}

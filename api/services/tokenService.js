@@ -46,8 +46,8 @@ export const blacklistToken = async (token) => {
  * @returns {Promise<boolean>} True if the token is blacklisted, otherwise false.
  */
 export const isBlacklisted = async (token) => {
-    const blacklisted = await prisma.refreshToken.findUniqueOrThrow({
-        where: { token, blacklisted: true }
+    const refreshToken = await prisma.refreshToken.findUniqueOrThrow({
+        where: { token }
     });
-    return !!blacklisted;   // double NOT operator
+    return refreshToken?.blacklisted; 
 };

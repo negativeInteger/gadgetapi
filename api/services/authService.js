@@ -13,12 +13,12 @@ import { ExpressError } from '../errors/ExpressError.js';
  * Register a new user.
  * - Hashes the provided password.
  * - Saves user credentials to the database.
- * - Defaults the role to 'user' if not provided.
+ * - Defaults the role to 'USER' if not provided.
  * - Throws an error if the username is already taken.
  * @param {Object} data - User registration data
  * @param {string} data.username - Username for the new user
  * @param {string} data.password - Plain-text password to be hashed
- * @param {string} [data.role] - Optional user role (default: 'user')
+ * @param {string} [data.role] - Optional user role (default: 'USER')
  * @throws {ExpressError} If the username is already registered
  */
 export const register = async (data) => {
@@ -29,7 +29,7 @@ export const register = async (data) => {
             data: {
                 username,
                 password: hashedPassword,
-                role: data.role || 'user'
+                role: data.role || 'USER'
             }
         }); 
     } catch (err) {
