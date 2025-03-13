@@ -1,7 +1,7 @@
 # Gadget API Documentation
 
 ## Overview
-The **Gadget API** allows users to manage gadgets efficiently. It supports full CRUD operations, robust authentication, and token revocation. Built using **Node.js, Express, PostgreSQL, and Prisma**, it ensures scalability and security.
+The **Gadget API** allows users to manage gadgets efficiently. It supports full CRUD operations, robust authentication, authorization and token revocation. Built using **Node.js, Express, PostgreSQL, and Prisma**, it ensures scalability and security.
 
 ## Features
 - **User Authentication**: Secure login and registration with JWT-based authentication.
@@ -10,13 +10,12 @@ The **Gadget API** allows users to manage gadgets efficiently. It supports full 
 - **CRUD Operations**: Create, read, update, and delete gadgets.
 - **Self Destruct**: Self-Destruct via confirmation code.
 - **Swagger Documentation**: API endpoints are documented with Swagger.
-- **Testing**: Uses Jest for testing and Prisma for database interactions.
 
 ## Getting Started
 
 ### Prerequisites
 Ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (version v22.11.0 or higher)
+- [Node.js](https://nodejs.org/) (version 22.11.0 or higher)
 - [PostgreSQL](https://www.postgresql.org/) (version 17.4 or higher)
 - [Prisma](https://www.prisma.io/)
 
@@ -40,6 +39,7 @@ npm start
 ```
 
 ## Authentication
+
 ### Register
 **Endpoint:** `POST /api/auth/register`
 
@@ -49,21 +49,21 @@ npm start
 ```json
 {
   "username": "john_doe",
-  "password": "securepassword"
+  "password": "securepassword",
   "role": "ADMIN"
 }
 ```
 **Response:**
 ```json
 {
-  "message": "Registration successfull!, Hey john_doe you can login now",
+  "message": "Registration successful! Hey john_doe, you can login now."
 }
 ```
 
 ### Login
 **Endpoint:** `POST /api/auth/login`
 
-**Description:** Authenticates a user and set tokens.
+**Description:** Authenticates a user and sets tokens.
 
 **Request Body:**
 ```json
@@ -72,7 +72,9 @@ npm start
   "password": "securepassword"
 }
 ```
+
 ## Gadgets API
+
 ### Create a Gadget
 **Endpoint:** `POST /api/gadgets`
 
@@ -83,42 +85,42 @@ npm start
 {
   "name": "Smartwatch",
   "description": "BrandX",
-  "status": "AVAILABLE"
 }
 ```
 **Response:**
 ```json
-  {
-    "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
-    "name": "Smartwatch",
-    "codename: "IMF-zaddcYU34d"
-    "status": "AVAILABLE",
-    "createdAt": "2025-03-10 12:39:51.525",
-    "updatedAt": "2025-03-10 12:40:07.373",
-    "decommissionedAt": null
-  }
+{
+  "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
+  "name": "Smartwatch",
+  "codename": "IMF-zaddcYU34d",
+  "status": "AVAILABLE",
+  "createdAt": "2025-03-10 12:39:51.525",
+  "updatedAt": "2025-03-10 12:40:07.373",
+  "decommissionedAt": null
+}
 ```
+
 ### Get All Gadgets
 **Endpoint:** `GET /api/gadgets`
 
-**Authentication:** Bearer Token
+**Authentication:** HTTP-only cookies (`accessToken` and `refreshToken`)
 
 **Response:**
 ```json
 [
   {
-    "id": '1cdbbea8-e913-4c49-9f59-745382e2d4b2',
+    "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
     "name": "Smartwatch",
-    "codename: "IMF-zaddcYU34d",
+    "codename": "IMF-zaddcYU34d",
     "status": "AVAILABLE",
     "createdAt": "2025-03-10 12:39:51.525",
     "updatedAt": "2025-03-10 12:40:07.373",
     "decommissionedAt": null
   },
   {
-    "id": '1cdbbea8-e913-4c49-9f59-745382e2d4b2',
+    "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
     "name": "Laptop",
-    "codename: "IMF-cappcYU57w",
+    "codename": "IMF-cappcYU57w",
     "status": "DECOMMISSIONED",
     "createdAt": "2025-03-10 12:39:51.525",
     "updatedAt": "2025-03-10 12:40:07.373",
@@ -130,7 +132,7 @@ npm start
 ### Update a Gadget
 **Endpoint:** `PATCH /api/gadgets/:id`
 
-**Authentication:** Bearer Token
+**Authentication:** HTTP-only cookies (`accessToken` and `refreshToken`)
 
 **Request Body:**
 ```json
@@ -142,74 +144,73 @@ npm start
 ```
 **Response:**
 ```json
-  {
-    "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
-    "name": "Smartwatch",
-    "codename: "IMF-zaddcYU34d"
-    "status": "DEPLOYED",
-    "createdAt": "2025-03-10 12:39:51.525",
-    "updatedAt": "2025-03-10 12:40:07.373",
-    "decommissionedAt": null
-  }
+{
+  "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
+  "name": "Smartwatch",
+  "codename": "IMF-zaddcYU34d",
+  "status": "DEPLOYED",
+  "createdAt": "2025-03-10 12:39:51.525",
+  "updatedAt": "2025-03-10 12:40:07.373",
+  "decommissionedAt": null
+}
 ```
+
 ### Delete a Gadget
 **Endpoint:** `DELETE /api/gadgets/:id`
 
-**Authentication:** Bearer Token
+**Authentication:** HTTP-only cookies (`accessToken` and `refreshToken`)
 
-**Description:** Setting status to DECOMISSIONED, and adding a timestamp
+**Description:** Setting the status to `DECOMMISSIONED`, and adding a timestamp.
 
 **Response:**
 ```json
-  {
-    "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
-    "name": "Smartwatch",
-    "codename: "IMF-zaddcYU34d"
-    "status": "DECOMMISSIONED",
-    "createdAt": "2025-03-10 12:39:51.525",
-    "updatedAt": "2025-03-10 12:40:07.373",
-    "decommissionedAt": 2025-03-10 12:40:07.373
-  }
+{
+  "id": "1cdbbea8-e913-4c49-9f59-745382e2d4b2",
+  "name": "Smartwatch",
+  "codename": "IMF-zaddcYU34d",
+  "status": "DECOMMISSIONED",
+  "createdAt": "2025-03-10 12:39:51.525",
+  "updatedAt": "2025-03-10 12:40:07.373",
+  "decommissionedAt": "2025-03-10 12:40:07.373"
+}
 ```
+
 ### Self-Destruct a Gadget
-**Endpoint:** `DELETE /api/gadgets/:id/self-destruct`
+**Endpoint:** `POST /api/gadgets/:id/self-destruct`
 
-**Authentication:** Bearer Token
+**Authentication:** HTTP-only cookies (`accessToken` and `refreshToken`)
 
-**Description:** Initiating self-destruct by sending a confirmation code
+**Description:** Initiates the self-destruct by generating a confirmation code.
 
 **Response:**
 ```json
-  {
-    "message": "Confirmation code generated. Use this code to confirm self-destruct.",
-    "expiresIn": "3 minutes",
-    "code": "123567"
-  }
+{
+  "message": "Confirmation code generated. Use this code to confirm self-destruct.",
+  "expiresIn": "3 minutes",
+  "code": "123567"
+}
 ```
+
 ### Confirm Self-Destruct Gadget
-**Endpoint:** `DELETE /api/gadgets/:id/self-destruct/confirm`
+**Endpoint:** `POST /api/gadgets/:id/self-destruct/confirm`
 
-**Authentication:** Bearer Token
+**Authentication:** HTTP-only cookies (`accessToken` and `refreshToken`)
 
-**Description:** Permanently deletes gadget if the code matches
+**Description:** Permanently deletes the gadget if the code matches.
 
 **Request Body:** 
 ```json
-  {
-    "code": "123567"
-  }
+{
+  "code": "123567"
+}
 ```
+
 ## Token Revocation
+
 ### Logout
 **Endpoint:** `POST /api/auth/logout`
 
-**Description:** Revokes the user's token and logs out the user and remove tokens
-
-## Testing
-Run the test suite using:
-```sh
-npm test
-```
+**Description:** Revokes the user's token and logs out the user by removing the tokens.
 
 ## Swagger Documentation
 Access the Swagger UI at:
@@ -219,4 +220,3 @@ http://localhost:3000/docs
 
 ## License
 This project is licensed under the MIT License.
-
