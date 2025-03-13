@@ -9,6 +9,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/tokens.js';
 import { saveRefreshToken } from '../services/tokenService.js';
 import { REFRESH_TOKEN_EXPIRE_TIME } from '../config/constants.js';
 import { ExpressError } from '../errors/ExpressError.js';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 /**
  * Register a new user.
  * - Hashes the provided password.
