@@ -119,7 +119,7 @@ export const selfDestructGadgetConfirm = async (req, res, next) => {
         const validCode = getItemFromLocalStorage('code');
         // Check if the provided code matches
         const isValidCode = inputCode === validCode;
-        if (! isValidCode) throw new ExpressError('Bad Request', 'Incorrect Confirmation Code', 401);
+        if (!isValidCode) throw new ExpressError('Bad Request', 'Incorrect Confirmation Code', 401);
         // Remove the confirmation code from local storage
         removeItemFromLocalStorage('code');
         // Permanently delete the gadget

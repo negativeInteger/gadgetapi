@@ -21,7 +21,6 @@ import { generateMissionSuccessProbability } from "../utils/missionSuccessProbab
  */
 export const create = async ({ name, description, status }) => {
     const codename = generateCodename();
-
     const newGadget = await prisma.gadget.create({
         data: {
             name,
@@ -30,9 +29,7 @@ export const create = async ({ name, description, status }) => {
             status
         }
     });
-
     if (!newGadget) throw new ExpressError('Internal Server Error', 'Gadget Creation Failed', 500);
-    
     return newGadget; 
 };
 /**
@@ -50,7 +47,6 @@ export const list = async ({ page = 1, limit = 10, status }) => {
     // Check if status is valid
     const validStatuses = ['AVAILABLE', 'DEPLOYED', 'DECOMMISSIONED', 'DESTROYED'];
     if (status && !validStatuses.includes(status)) throw new ExpressError('Validation Error', 'Invalid status parameter', 400);
-
     const gadgets = await prisma.gadget.findMany({
         where,
         skip: (page - 1) * limit,
@@ -136,7 +132,7 @@ export const decommission = async (id) => {
  * Self-Destruct Gadget Service
  * - Initiates self-destruction by generating a confirmation code.
  * @param {string} id - Gadget ID.
- * @returns {Promise<Object>} A response containing a message with confirmation code and expiry time.
+ * @returns {Promise<Object>} A response containing a message with expiry time and confirmation code.
  * @throws {ExpressError} If gadget is not found or initiation fails.
  */
 export const selfDestruct = async (id) => {

@@ -31,7 +31,7 @@ export const saveRefreshToken = async (token, userId, device, ipAddress, expires
  * @returns {Promise<Object>} The update result.
  */
 export const blacklistToken = async (token) => {
-    return await prisma.refreshToken.updateMany({
+    return await prisma.refreshToken.update({
         where: { token },
         data: {
             blacklisted: true,
@@ -46,7 +46,7 @@ export const blacklistToken = async (token) => {
  * @returns {Promise<boolean>} True if the token is blacklisted, otherwise false.
  */
 export const isBlacklisted = async (token) => {
-    const blacklisted = await prisma.refreshToken.findFirst({
+    const blacklisted = await prisma.refreshToken.findUniqueOrThrow({
         where: { token, blacklisted: true }
     });
     return !!blacklisted;   // double NOT operator

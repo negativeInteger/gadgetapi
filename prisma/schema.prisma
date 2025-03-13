@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"  // Generate Prisma Client
 }
@@ -17,7 +11,8 @@ model User {
   id        String     @id @default(uuid())           // UUID
   username  String     @unique                        // unique username
   password  String                                    // hashed password
-  role      String     @default("user")               // Role-Based-Access (user/admin)
+  role      Role       @default(user)                 // Role-Based-Access (user/admin)
+  createdAt DateTime   @default(now())
 }
 
 model Gadget {
@@ -35,13 +30,18 @@ model RefreshToken {
   id            String        @id @default(uuid())      // Unique Token ID
   token         String        @unique                   // Actual Refresh Token
   blacklisted   Boolean       @default(false)           // Track if Token is Revoked
-  userId        String                             
+  userId        String                                  // Tracks associated user
   device        String?                                 // Optional Device Info
   ipAddress     String?                                 // Optional IP Address
   expiresAt     DateTime                                // Expiration Date
   revokedAt     DateTime?                               // Revocation Timestamp
   createdAt     DateTime      @default(now())           // Creation Date
   updatedAt     DateTime      @updatedAt                // Auto-Update on Blacklist
+}
+
+enum Role {
+  user
+  admin
 }
 
 enum GadgetStatus {

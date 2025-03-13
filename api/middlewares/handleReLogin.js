@@ -4,7 +4,7 @@ import { ExpressError } from "../errors/ExpressError.js";
  * Middleware to handle re-login based on the presence of valid access and refresh tokens in cookies.
  * This checks if the user is already logged in by verifying the tokens.
  * If the token is expired, it proceeds without an error, allowing the user to refresh the token or log in again.
- * If the token is invalid, it returns a 401 Unauthorized response.
+ * If the token is invalid, it returns a 401 response.
  * @param {Object} req - The request object containing cookies.
  * @param {Object} res - The response object (not used here but required for Express middleware).
  * @param {Function} next - The callback function to pass control to the next middleware.

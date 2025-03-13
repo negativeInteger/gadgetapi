@@ -52,14 +52,11 @@ export const register = async (data) => {
 export const login = async ({ username, password }, device, ipAddress) => {
     const user = await prisma.user.findUnique({ where: { username } });
     if (!user) throw new ExpressError('Authentication','Invalid Credentials', 401);
-
     const validPassword = await comparePassword(password, user.password);
     if (!validPassword) throw new ExpressError('Authentication', 'Invalid Credentials', 401);
-
+    // Generate Tokens
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-
     await saveRefreshToken(refreshToken, user.id, device, ipAddress, new Date(Date.now() + REFRESH_TOKEN_EXPIRE_TIME))
-
     return { user, accessToken, refreshToken };
 };

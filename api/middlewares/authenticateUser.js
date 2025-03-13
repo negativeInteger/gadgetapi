@@ -6,7 +6,7 @@ import { isLoggedIn } from "./isLoggedIn.js";
 import { verifyRefreshToken } from "./verifyRefreshToken.js";
 /**
  * Middleware stack for user authentication.
- * - `isLoggedIn`: Ensures the user is logged in.
- * - `verifyRefreshToken`: Verifies the validity of the refresh token.
+ * - `isLoggedIn`: Ensures the user is logged in. (checks for accessToken)
+ * - `verifyRefreshToken`: Verifies the validity of the refresh token. (rotates tokens if accessToken expires)
  */
 export const authenticateUser = [isLoggedIn, verifyRefreshToken];
