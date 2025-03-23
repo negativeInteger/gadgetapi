@@ -7,7 +7,7 @@ import {
      destroy
 } from "../services/gadgetService.js";
 import { createGadgetSchema, updateGadgetSchema } from "../validations/gadgetValidation.js";
-import { confirmationCodeSchema } from "../validations/confirmationCodeSchema.js";
+import { confirmationCodeSchema } from "../validations/confirmationCodeValidation.js";
 import { 
     setItemToLocalStorage, 
     getItemFromLocalStorage, 

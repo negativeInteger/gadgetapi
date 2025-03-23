@@ -26,8 +26,9 @@ app.use(express.json());
 // Setup Swagger API documentation
 setupSwagger(app);
 
-
 // Routes
+
+// Home Route
 app.get("/", (req, res) => {
     res.send(`
       <html>
@@ -42,7 +43,9 @@ app.get("/", (req, res) => {
       </html>
     `);
 });
+// Auth Routes
 app.use('/api/auth', authRouter);
+// Gadget Routes
 app.use('/api/gadgets', gadgetRouter);
 
 // Handle undefined routes
