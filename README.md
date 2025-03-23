@@ -1,7 +1,7 @@
 # Gadget API Documentation
 
 ## Overview
-The **Gadget API** allows users to manage gadgets efficiently. It supports full CRUD operations, robust authentication, authorization and token revocation. Built using **Node.js, Express, PostgreSQL, and Prisma**, it ensures scalability and security.
+The **Gadget API** allows users to manage gadgets efficiently. It supports full CRUD operations, robust authentication, authorization and token revocation. Built using **Node.js, Express, PostgreSQL, Prisma and Zod**, it ensures scalability and security.
 
 ## Features
 - **User Authentication**: Secure login and registration with JWT-based authentication.
@@ -18,6 +18,7 @@ Ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (version 22.11.0 or higher)
 - [PostgreSQL](https://www.postgresql.org/) (version 17.4 or higher)
 - [Prisma](https://www.prisma.io/)
+- [Zod](https://zod.dev/)
 
 ### Installation
 ```sh
