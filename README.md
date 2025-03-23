@@ -1,7 +1,7 @@
 # Gadget API Documentation
 
 ## Overview
-The **Gadget API** allows users to manage gadgets efficiently. It supports full CRUD operations, robust authentication, authorization and token revocation. Built using **Node.js, Express, PostgreSQL, and Prisma**, it ensures scalability and security.
+**Gadget API** is a secure and scalable backend system for managing gadgets with role-based access control for users and admins.It features full **CRUD** operations, **JWT authentication** using access and refresh tokens via cookies, and unique self-destruct API with TTL-based confirmation logic. Built with **Node.js**, **Express**, **Prisma ORM**, **PostgreSQL**, and **Zod** for input validation and robust Error handling using a custom Error class. Focuses on clean code, secure practices, and is deployed on Render.
 
 ## Features
 - **User Authentication**: Secure login and registration with JWT-based authentication.
@@ -18,6 +18,7 @@ Ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (version 22.11.0 or higher)
 - [PostgreSQL](https://www.postgresql.org/) (version 17.4 or higher)
 - [Prisma](https://www.prisma.io/)
+- [Zod](https://zod.dev/)
 
 ### Installation
 ```sh
@@ -211,6 +212,19 @@ npm start
 **Endpoint:** `POST /api/auth/logout`
 
 **Description:** Revokes the user's token and logs out the user by removing the tokens.
+
+## 🛠️ Error Handling
+This API uses a **centralized global error handler** to ensure consistent error responses across all routes.
+
+### Error Response Format
+All errors are returned in the following JSON structure:
+
+```json
+{
+  "errorType": "Type of Error",
+  "message": "Descriptive error message"
+}
+```
 
 ## Swagger Documentation
 Access the Swagger UI at:
