@@ -1,7 +1,7 @@
 # Gadget API Documentation
 
 ## Overview
-**Gadget API** is a secure and scalable backend system for managing gadgets with role-based access control for users and admins.It features full CRUD operations, JWT authentication using access and refresh tokens via cookies, and unique self-destruct API with TTL-based confirmation logic. Built with Node.js, Express, Prisma ORM, PostgreSQL, and Zod for input validation. Focuses on clean code, secure practices, and is deployed on Render.
+**Gadget API** is a secure and scalable backend system for managing gadgets with role-based access control for users and admins.It features full CRUD operations, JWT authentication using access and refresh tokens via cookies, and unique self-destruct API with TTL-based confirmation logic. Built with **Node.js**, **Express**, **Prisma ORM**, **PostgreSQL**, and **Zod** for input validation. Focuses on clean code, secure practices, and is deployed on Render.
 
 ## Features
 - **User Authentication**: Secure login and registration with JWT-based authentication.
