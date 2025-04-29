@@ -3,32 +3,36 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { LocalStorage } from 'node-localstorage';
-import { authRouter } from './routes/authRouter.js';
-import { gadgetRouter } from './routes/gadgetRouter.js'
+import { authRouter } from './routes/authRoutes.js';
+import { gadgetRouter } from './routes/gadgetRoutes.js'
 import { errorHandler } from './errors/errorHandler.js';
-import { setupSwagger } from './config/swagger.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { setupSwagger } from './config/swagger.js';
 
 // Load environment variables only in non-production environments
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
-  
+
+// Express app instance
 const app = express();
-// node-localstorage for storing self-destruct sequence confirmation codes
+
+// Node-localStorage for storing self-destruct sequence confirmation codes
 const localStorage = new LocalStorage("./codes"); 
 
-// Security Middleware
+// Security middleware
 app.use(helmet());
 app.use(cookieParser());
+
+// JSON parsing middleware
 app.use(express.json());
 
-// Setup Swagger API documentation
+// Setup Swagger API-documentation
 setupSwagger(app);
 
 // Routes
 
-// Home Route
+// Home route
 app.get("/", (req, res) => {
     res.send(`
       <html>
@@ -43,12 +47,12 @@ app.get("/", (req, res) => {
       </html>
     `);
 });
-// Auth Routes
+// Auth routes
 app.use('/api/auth', authRouter);
-// Gadget Routes
+// Gadget routes
 app.use('/api/gadgets', gadgetRouter);
 
-// Handle undefined routes
+// Undefined routes handler
 app.use(notFoundHandler)
 
 // Global error handler

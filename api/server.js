@@ -8,6 +8,6 @@ app.listen(PORT, () => {
     logger.info(`[INFO] Server running in ${ENV} mode on port ${PORT}`);
 }).on('error', (err) => {
     logger.error('[ERROR] Failed to start server:', err);
-    process.exit(1);
+    process.exit(1); // Shut down if there is a startup error
 });
 
