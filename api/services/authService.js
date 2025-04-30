@@ -24,14 +24,14 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
  */
 
 export const register = async (data) => {
-    const { username, password } = data;
+    const { username, password, role } = data;
     const hashedPassword = await hashPassword(password);
     try {
         const user = await prisma.user.create({
             data: {
                 username,
                 password: hashedPassword,
-                role: data.role || 'USER'
+                role: role || 'USER'
             }
         });
         return user;
@@ -65,5 +65,5 @@ export const login = async ({ username, password }, device, ipAddress) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     await saveRefreshToken(refreshToken, user.id, device, ipAddress, new Date(Date.now() + REFRESH_TOKEN_EXPIRE_TIME))
-    return { user, accessToken, refreshToken };
+    return { accessToken, refreshToken };
 };
